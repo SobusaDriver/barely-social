@@ -10,6 +10,8 @@
 
   const site = SITES.find((s) => location.hostname.includes(s)) || null;
   if (!site) return;
+  // marcador de diagnóstico: confirma inyección del content script
+  window.__BS_SITE = site;
 
   // ---- estado (claves reservadas por background.js: "sites", "allowance") ----
   const state = { sites: {}, allowance: {} };
