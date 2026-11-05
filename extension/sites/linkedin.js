@@ -37,6 +37,15 @@
       const card = q.snapshotItem(i).closest('[role="listitem"]');
       if (card) hide(card, "promoted");
     }
+    // Mensajería: LinkedIn inyecta conversaciones publicitarias en la lista
+    // con etiqueta propia ("Promoted"/"Sponsored") o "LinkedIn Offer".
+    // InMail y mensajes reales se quedan.
+    for (const row of document.querySelectorAll('ul[aria-label="Conversation List"] > li')) {
+      const promo = [...row.querySelectorAll("span, p")].some((e) =>
+        /^(promoted|promocionado|sponsored|patrocinado|linkedin offer)$/i.test((e.textContent || "").trim())
+      );
+      if (promo) hide(row, "promoted-message");
+    }
     // Rail: upsell de Premium (ancla exacta). Se oculta solo su bloque,
     // subiendo mientras el padre contenga EXACTAMENTE el mismo texto — el
     // mini-perfil (que contiene el link) jamás entra en el hide.

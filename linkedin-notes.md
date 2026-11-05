@@ -64,6 +64,11 @@ handles, cascade guards…) was defeated by three converging forces:
   mini-profile rail (which contains the link) can never be selected.
 - **Ad iframes** (`iframe[title="advertisement"]`, dynamic ads and the Ad
   Options preview) are hidden by CSS.
+- **Messaging**: promotional conversations are hidden from the conversation
+  list (`ul[aria-label="Conversation List"] > li`) when a row carries the exact
+  label `Promoted`/`Promocionado`/`Sponsored`/`Patrocinado` or LinkedIn's own
+  `LinkedIn Offer` (the "Redeem my free trial" thread). InMail and real
+  conversations are kept.
 - Network-level LinkedIn ad hosts (`ads.linkedin.com`, `adg.linkedin.com`,
   `px.ads.linkedin.com`, …) are already blocked by the shared DNR ruleset.
 
