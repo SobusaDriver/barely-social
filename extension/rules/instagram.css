@@ -111,8 +111,13 @@ article:has([aria-label*="See more like this" i]) {
    Instagram pinta el acento con gradientes inline (anillos de historias,
    badges, íconos): CSS lo cubre instantánea por atajo de atributo del style.
    El gris se aplica al primer paint, sin esperar al JS. */
-[style*="gradient"],
-svg [fill*="url(#"],
+[style*="radient" i],
+[style*="fdf497" i],
+[style*="ff0069" i],
+[style*="255, 48" i],
+svg:has(linearGradient),
+svg:has(radialGradient),
+svg:has(stop[stop-color]),
 svg [stroke*="url(#"],
 [data-ba*="gradient"] {
   filter: grayscale(1) brightness(0.9) !important;

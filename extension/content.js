@@ -149,27 +149,30 @@
 
   // ---- Instagram ----
   function neutralizeAccent() {
-    // todo lo "rojo/rosa de Meta" → gris. Heurística de color en estilos
-    // computados: fondos, box-shadows (badge) y SVG con gradiente/acento.
-    const ACCENT_RE = /rgba?\(\s*(255|247|246)\s*,\s*(48|59)\s*/;
-    const isAccent = (str) => ACCENT_RE.test(str);
+    // Estrategia geométrica: IG usa stylesheet ofuscado (nada matcheable por
+    // nombre/clase/atributo), pero los "acento" son SIEMPRE elementos pequeños
+    // y redondos respaldados por gradiente, shadow de color o SVG degradado:
+    // story rings, badges de notificación, íconos. Escaneo limitado y barato.
+    const ACCENT = /rgba?\(\s*(2(?:4[0-9]|5[0-5]))\s*,\s*(\d|[1-9]\d)\s*[),]/;
+    const isAccent = (str) => ACCENT.test(str);
     const targets = new Set();
-    for (const el of document.querySelectorAll("svg, span, div")) {
+    for (const el of document.querySelectorAll("div, span, svg")) {
       const cs = getComputedStyle(el);
+      if (!el.offsetParent || cs.display === "none" || cs.visibility === "hidden") continue;
+      const r = el.getBoundingClientRect();
+      // los elementos de acento nunca exceden ~ 220px (story avatar/máx);
+      // por encima de eso es contenido real (cards, modales, fotos feas).
+      if (r.width > 220 || r.height > 220) continue;
       let hit = false;
       if (el.tagName === "SVG") {
-        hit = el.querySelector("linearGradient, radialGradient") != null;
-        if (!hit) hit = [...el.querySelectorAll("*")].some((c) => {
-          const f = getComputedStyle(c).fill || "";
-          return isAccent(f) || f.includes("url(#");
-        });
+        hit = el.querySelector("linearGradient, radialGradient, stop") != null;
       } else {
         hit =
+          /gradient/i.test(cs.backgroundImage) ||
           isAccent(cs.backgroundColor) ||
-          isAccent(cs.boxShadow) ||
-          /linear|radial/.test(cs.backgroundImage);
+          isAccent(cs.boxShadow);
       }
-      if (hit && el.offsetParent) targets.add(el);
+      if (hit) targets.add(el);
     }
     for (const el of targets) {
       if (el.dataset.bsGray) continue;
