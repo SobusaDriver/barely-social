@@ -12,3 +12,10 @@ a[href*="upsellSlotId=IDENTITY_MODULE"] {
 iframe[title="advertisement"] {
   display: none !important;
 }
+
+/* Tarjeta "Today's puzzles": se oculta el bloque COMPLETO del rail (el hijo
+   que contiene el componente), no solo #feedRightNavGamesComponentRef — si
+   solo se oculta el nodo interno queda el marco blanco vacío. */
+aside[aria-label="Aside"] > div:has(#feedRightNavGamesComponentRef) {
+  display: none !important;
+}
