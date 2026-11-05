@@ -2,13 +2,14 @@
 
 /* ===== Shorts ===== */
 
-/* Sidebar: la guía completa queda con SOLO Suscripciones.
+/* Sidebar: la guía completa queda con "Tú", "Historial" y "Suscripciones".
    Exact-match por href (estable) y no por nombre de tag (cambia en YT).
-   Se oculta toda sección del guía que no contenga el link a subscriptions. */
-ytd-guide-section-renderer:not(:has(a[href="/feed/subscriptions"])),
-ytd-guide-section-renderer:not(:has(a[href^="/feed/subscriptions"])),
-ytd-mini-guide-renderer tp-yt-paper-item:not(:has(a[href="/feed/subscriptions"])),
-ytd-mini-guide-renderer ytd-mini-guide-entry-renderer:not(:has(a[href="/feed/subscriptions"])),
+   Se oculta toda sección del guía que no contenga esos links. */
+ytd-guide-section-renderer:not(:has(a[href="/feed/subscriptions"], a[href^="/feed/you"], a[href^="/feed/history"])) {
+  display: none !important;
+}
+ytd-mini-guide-renderer tp-yt-paper-item:not(:has(a[href="/feed/subscriptions"], a[href^="/feed/you"], a[href^="/feed/history"])),
+ytd-mini-guide-renderer ytd-mini-guide-entry-renderer:not(:has(a[href="/feed/subscriptions"], a[href^="/feed/you"], a[href^="/feed/history"])),
 ytd-guide-footer-renderer,
 ytd-mini-guide-footer-renderer,
 ytd-guide-entry-renderer[title*="Shorts" i],

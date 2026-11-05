@@ -257,7 +257,8 @@
         "ytd-guide-entry-renderer, ytd-mini-guide-entry-renderer"
       )) {
         const t = (ent.textContent || "").trim();
-        if (!/suscripciones|subscriptions/i.test(t)) {
+        const KEEP = /suscripciones|subscriptions|\bt[uú]\b|\byou\b|historial|history/i;
+        if (!KEEP.test(t)) {
           ent.remove(); changed = true;
         }
       }
