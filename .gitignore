@@ -2,3 +2,6 @@ DerivedData/
 *.xcuserdatad/
 xcuserdata/
 .DS_Store
+.pw-profile*/
+reports/
+.venv/
