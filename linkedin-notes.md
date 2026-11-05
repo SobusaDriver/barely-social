@@ -69,6 +69,11 @@ handles, cascade guards…) was defeated by three converging forces:
   label `Promoted`/`Promocionado`/`Sponsored`/`Patrocinado` or LinkedIn's own
   `LinkedIn Offer` (the "Redeem my free trial" thread). InMail and real
   conversations are kept.
+- **Grow page** (`/mynetwork/grow/`): the games promo ("Need a 30 second
+  break? … Zip") and the "People who viewed your profile" card (analytics +
+  "Unlock all with Premium") are hidden at the `main section` level. The
+  "People you may know" cards and the "Suggestions for you" people list are
+  **kept** — they are real people, not junk.
 - Network-level LinkedIn ad hosts (`ads.linkedin.com`, `adg.linkedin.com`,
   `px.ads.linkedin.com`, …) are already blocked by the shared DNR ruleset.
 

@@ -25,7 +25,10 @@
     el.dataset.bsReason = reason;
   };
 
-  const hideAds = () => {
+  // Ads, promos y relleno del feed/rail/My Network. "People you may know"
+  // (en sus dos variantes) y "Suggestions for you" son personas reales: se
+  // quedan.
+  const clean = () => {
     // Feed: el ad se marca con el texto exacto "Promoted" (o "Promocionado").
     // El card es el [role="listitem"] que lo contiene — la lista está
     // virtualizada, así que el nodo existe aunque esté fuera de viewport.
@@ -58,6 +61,16 @@
       }
       hide(e, "premium-upsell");
     }
+    // /mynetwork/grow/: promos de juegos ("Need a 30 second break? … Zip") y
+    // "People who viewed your profile" (analytics + Unlock all with Premium).
+    // La sección externa es la tarjeta; People you may know NO empieza así.
+    for (const s of document.querySelectorAll("main section")) {
+      const t = (s.textContent || "").replace(/\s+/g, " ").trim();
+      if (/^(need a 30 second break|zip is linkedin)/i.test(t) ||
+          /^(people who viewed your profile|personas que vieron tu perfil)/i.test(t)) {
+        hide(s, "junk");
+      }
+    }
   };
 
   BS.boot(() => {
@@ -73,11 +86,11 @@
     }
     addEventListener("popstate", route);
 
-    BS.retry(() => { hideAds(); return true; });
+    BS.retry(() => { clean(); return true; });
     let timer = null;
     new MutationObserver(() => {
       if (timer) return;
-      timer = setTimeout(() => { timer = null; try { hideAds(); } catch {} }, 400);
+      timer = setTimeout(() => { timer = null; try { clean(); } catch {} }, 400);
     }).observe(document.documentElement, { childList: true, subtree: true });
   });
 })();
