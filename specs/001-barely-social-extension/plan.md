@@ -1,5 +1,13 @@
 # Plan: BarelySocial — Safari Web Extension
 
+## Regla de entorno de pruebas (fijada por el usuario)
+
+> **Playwright/automatización de Chromium es SIEMPRE el ÚLTIMO recurso.**
+> Primero: pruebas manuales por el usuario en **Chrome real** (cuenta dev ya
+> paga) inspeccionado vía **real-browser-mcp** (Extensión real-browser-mcp
+> conectada por Native Messaging a su propio Chrome, tab con acceso a su
+> sesión). Solo si real-browser-mcp no puede (caso extremo), Playwright.
+
 ## Tech (única decisión técnica razonable)
 - **Safari Web Extension, Manifest V3** (Safari soporta `declarativeNetRequest` y MV3 desde 15.4+; en Safari MV3 usa event page, no service worker).
 - Generación del proyecto Xcode: `xcrun safari-web-extension-converter` sobre una extensión web vanilla (camino estándar de Apple, sin tocar el proyecto a mano).
