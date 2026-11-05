@@ -1,4 +1,4 @@
-/* Last verified: 2026-11-04 — selectors may drift when Instagram changes HTML */
+/* Última verificación: 2026-11-05 — los selectores pueden romperse cuando Instagram cambie su HTML */
 /* SocialLite parity for instagram.com. Hide-only, fail-open. */
 
 /* ---------- Reels: nav items (sidebar + bottom bar) ---------- */
@@ -106,3 +106,20 @@ article:has([aria-label*="See more like this" i]) {
 }
 
 /* ---------- Kept (do-not-touch): Following feed, Stories, DMs, profile — explicit, no selectors needed here, just no blanket hides above ---------- */
+
+/* ---------- Acento neutro (gris) ----------
+   Instagram pinta el acento con gradientes inline (anillos de historias,
+   badges, íconos): CSS lo cubre instantánea por atajo de atributo del style.
+   El gris se aplica al primer paint, sin esperar al JS. */
+[style*="gradient"],
+svg [fill*="url(#"],
+svg [stroke*="url(#"],
+[data-ba*="gradient"] {
+  filter: grayscale(1) brightness(0.9) !important;
+}
+/* excepción: no grayscalear contenido real (fotos/vídeos) */
+img, video,
+[style*="gradient"] img,
+[style*="gradient"] video {
+  filter: none !important;
+}

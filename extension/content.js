@@ -195,14 +195,19 @@
     // acento neutro: anillos de historias, badges de notificación, iconos con
     // gradiente rosa/rojo de IG → escala de grises (CSS no puede matchear color)
     retry(() => { neutralizeAccent(); return true; });
-    let accentTimer = null;
-    const accentObs = new MutationObserver(() => {
-      // spaghettificación fina: IG manda mutaciones a cada rato; debouce 400 ms
-      if (accentTimer) return;
-      accentTimer = setTimeout(() => {
-        accentTimer = null;
-        try { neutralizeAccent(); } catch {}
-      }, 400);
+    // afectado de re-scan: primer cycle inmediato y re-debounce corto (120ms)
+    const accentObs = new MutationObserver((_, obs) => {
+      // primer cambio → corre YA (sin debounce) para cubrir el primer paint
+      try { neutralizeAccent(); } catch {}
+      obs.disconnect();
+      // a partir de aquí, debounce 120 ms
+      let t = null;
+      const fast = new MutationObserver(() => {
+        if (t) return;
+        t = setTimeout(() => { t = null; try { neutralizeAccent(); } catch {} }, 120);
+      });
+      fast.observe(document.body, { childList: true, subtree: true });
+      obs.disconnect();
     });
     accentObs.observe(document.body, { childList: true, subtree: true });
     // home → asegurar pestaña "Siguiendo"
