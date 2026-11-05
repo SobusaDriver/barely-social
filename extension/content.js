@@ -287,11 +287,22 @@
       return changed;
     };
     retry(pruneGuide);
+    // Estantes del feed de Suscripciones: "Más relevantes" (algoritmo) fuera;
+    // queda cronológico ("Más recientes") — regla del usuario.
+    const pruneShelves = () => {
+      let changed = false;
+      for (const sh of document.querySelectorAll("ytd-rich-section-renderer")) {
+        const t = (sh.textContent || "").trim();
+        if (/relevant/i.test(t)) { sh.remove(); changed = true; }
+      }
+      return changed;
+    };
+    retry(pruneShelves);
     // el guía se (re)renderiza al expandir el hamburger → observador persistente
     let ytTimer = null;
     new MutationObserver(() => {
       if (ytTimer) return;
-      ytTimer = setTimeout(() => { ytTimer = null; try { pruneGuide(); } catch {} }, 600);
+      ytTimer = setTimeout(() => { ytTimer = null; try { pruneGuide(); pruneShelves(); } catch {} }, 600);
     }).observe(document.body, { childList: true, subtree: true });
     // Shorts → feed de suscripciones; el "solo seguidos" del home lo hace CSS
     if (/^\/shorts\//.test(location.pathname)) {
