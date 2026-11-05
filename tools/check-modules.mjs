@@ -31,6 +31,9 @@ for (const cs of manifest.content_scripts) {
 if (manifest.background.scripts[0] !== "lib/sites.js") {
   fail("background.scripts debe empezar por lib/sites.js");
 }
+for (const icon of [...Object.values(manifest.icons || {}), ...Object.values(manifest.action?.default_icon || {})]) {
+  if (!existsSync(join(ext, icon))) fail(`falta icono ${icon}`);
+}
 if (!read("popup/popup.html").includes('src="../lib/sites.js"')) {
   fail("popup.html no carga ../lib/sites.js");
 }

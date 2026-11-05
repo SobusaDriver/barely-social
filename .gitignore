@@ -5,3 +5,5 @@ xcuserdata/
 .pw-profile*/
 reports/
 .venv/
+dist/
+extension/_metadata/

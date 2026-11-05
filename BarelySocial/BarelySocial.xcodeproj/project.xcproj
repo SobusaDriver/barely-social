@@ -116,6 +116,12 @@
                 "BarelySocial Extension (iOS)/resources",
                 "BarelySocial Extension (macOS)/resources",
               ],
+            }, {
+              "path": "../../extension/icons",
+              "target-membership": [
+                "BarelySocial Extension (iOS)/resources",
+                "BarelySocial Extension (macOS)/resources",
+              ],
             },
           ],
         }, {
