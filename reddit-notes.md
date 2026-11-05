@@ -12,7 +12,7 @@ listing.
 | Layer | Owns |
 |---|---|
 | `rules/reddit.css` | All hides: nav tabs, listing-algorithm sections, promoted/suggested posts, "Latest" sections |
-| `content.js` (reddit) | Redirect of discovery URLs to the joined feed |
+| `sites/reddit.js` | Redirect of discovery URLs to the joined feed |
 
 This is the **leanest target in the project**: Reddit's new UI (shreddit)
 exposes stable custom elements (`shreddit-ad-post`, `faceplate-tracker`,

@@ -14,7 +14,7 @@ surface that leads you deeper into the recommendation engine is cut.
 | `rules/dnr.json` (DeclarativeNetRequest) | Network landing redirect + network-level ad/tracker blocks |
 | `rules/youtube.css` | Static surfaces: guide sections, shorts shelves, promoted DOM bits, upnext/endscreen/cards |
 | `extension/ads.js` (MAIN world, `document_start`) | Response rewriting of `/youtubei/v1/*` payloads: empties `adPlacements`, `adSlots`, `adBreaks`, `adFormats` |
-| `content.js` (youtube) | Redirect enforcement + sidebar prune (text-based, markup-agnostic) |
+| `sites/youtube.js` | Redirect enforcement + sidebar prune (text-based, markup-agnostic) |
 
 ## Key technical decisions
 

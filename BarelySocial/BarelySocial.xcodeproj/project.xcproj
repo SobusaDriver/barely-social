@@ -99,7 +99,19 @@
                 "BarelySocial Extension (macOS)/resources",
               ],
             }, {
-              "path": "../../extension/content.js",
+              "path": "../../extension/ads.js",
+              "target-membership": [
+                "BarelySocial Extension (iOS)/resources",
+                "BarelySocial Extension (macOS)/resources",
+              ],
+            }, {
+              "path": "../../extension/lib",
+              "target-membership": [
+                "BarelySocial Extension (iOS)/resources",
+                "BarelySocial Extension (macOS)/resources",
+              ],
+            }, {
+              "path": "../../extension/sites",
               "target-membership": [
                 "BarelySocial Extension (iOS)/resources",
                 "BarelySocial Extension (macOS)/resources",

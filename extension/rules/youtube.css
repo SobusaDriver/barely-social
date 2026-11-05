@@ -2,7 +2,7 @@
    Principio: to / siempre cae en /feed/subscriptions (redirect en JS+DNR),
    así que las reglas de home/chips/masthead son DEAD → fuera (YAGNI).
    La lógica del guía ("solo Tú/Historial/Suscripciones") es JS+CSS dual:
-   JS prune (content.js, recarga en re-render) + esta pieza estática. */
+   JS prune (sites/youtube.js, recarga en re-render) + esta pieza estática. */
 
 /* ---- Guía: secciones sin Suscripciones/Tú/Historial = fuera (incl. Shorts,
    Explorar, Más de YouTube); footer del guía fuera ---- */

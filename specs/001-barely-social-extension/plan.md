@@ -19,7 +19,9 @@ extension/            # fuente web-extension (indep de Xcode)
   manifest.json       # MV3, matches de los 5 dominios
   rules/instagram.css youtube.css reddit.css linkedin.css tiktok.css
   rules/dnr.json      # static ruleset: ads/tracking por dominio
-  content.js          # director de feed, overlays, allowance, redirecciones
+  lib/sites.js        # registro único de sitios (content/background/popup)
+  lib/core.js         # estado, retry, allowance, findTab, boot
+  sites/<id>.js       # una web por módulo: overlays + redirecciones
   background.js       # event page: estado por sitio, contador diario
   popup/popup.html|js # panel por sitio
 barely-social/        # proyecto Xcode que produce el converter
@@ -29,7 +31,7 @@ barely-social/        # proyecto Xcode que produce el converter
 1. **manifest**: `content_scripts` con `matches` por sitio, css por sitio, `document_start`; `declarative_net_request` con static ruleset; popup; host permissions exactos (5 dominios + subdominios www); storage.
 2. **dnr.json**: bloques de dominios de ads/tracking por plataforma (googleads, doubleclick, adcreative, analytics, ads de reddit/linkedin/meta IG, tiktok ad pixel).
 3. **css por sitio**: ocultar elementos — core surfaces + ads + recomendados; variables state-consistent; placeholders documentados donde el shortcode exacto depende del live DOM con fecha de verificación.
-4. **content.js**: router por hostname; forzar vista "Siguiendo" (redirect/hash/click), redirecciones F4, interceptor del elemento bloqueado (overlay), contador allowance con storage local (con day-rollover), fail-open en detectores.
+4. **sites/<id>.js + lib/core.js**: un módulo por web; forzar vista "Siguiendo" (redirect/hash/click), redirecciones F4, interceptor del elemento bloqueado (overlay), contador allowance con storage local (con day-rollover), fail-open en detectores.
 5. **background.js**: maneja toggles-on/off por sitio para timelines de reglas CSS (Runtime DNR toggles rápidos), counters, day rollover.
 6. **popup**: switches on/off (storage → background), allowance interactivo.
 7. **Xcode**: converter → proyecto generatizado; firmar con equipo Developer; targets macOS + iOS; scheme build scripts unificados con éxito.

@@ -1,6 +1,6 @@
 /* Instagram — CSS único y pequeño. Last verified: 2026-11-05
    Principio: CSS solo para superficies SIEMPRE-algorítmicas (fallo-open).
-   La lógica de sugeridos/ads/collabs vive en content.js (único dueño:
+   La lógica de sugeridos/ads/collabs vive en sites/instagram.js (único dueño:
    un solo motor para evitar colisiones DRY/KISS). */
 
 /* Reels: solo nav y modal (los reels de seguidos en el feed NO se tocan) */

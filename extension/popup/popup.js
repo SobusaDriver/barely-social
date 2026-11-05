@@ -1,13 +1,5 @@
 const api = typeof browser !== "undefined" ? browser : chrome;
 
-const SITES = [
-  { id: "instagram", dms: true },
-  { id: "youtube", dms: false },
-  { id: "reddit", dms: false },
-  { id: "linkedin", dms: true },
-  { id: "tiktok", dms: true },
-];
-
 function send(msg) {
   return api.runtime.sendMessage(msg);
 }
@@ -15,7 +7,7 @@ function send(msg) {
 async function init() {
   const cards = document.getElementById("cards");
   cards.innerHTML = "";
-  for (const { id, dms } of SITES) {
+  for (const { id, dms } of globalThis.BS_SITES) {
     const res = await send({ type: "get-state", site: id });
     const site = res.sites[id];
     const a = res.allowance;

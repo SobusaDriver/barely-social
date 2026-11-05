@@ -11,7 +11,7 @@ and intentional profile visits remain reachable.
 
 | Layer | Owns |
 |---|---|
-| `content.js` (tiktok) | Landing redirect (`/messages`), fallback to "Following" when messaging is off |
+| `sites/tiktok.js` | Landing redirect (`/messages`), fallback to "Following" when messaging is off |
 | `rules/tiktok.css` | Hide-only pass over every discovery surface still rendered |
 | `rules/dnr.json` | Network blocks for TikTok ad/analytic endpoints (`ads.tiktok.com`, `log-ads.tiktok.com`, `analytics.tiktok.com`, pixels) |
 

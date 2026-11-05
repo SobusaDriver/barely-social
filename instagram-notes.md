@@ -11,7 +11,7 @@ DMs, profiles, stories, search, and posting untouched.
 | Layer | Owns |
 |---|---|
 | `rules/instagram.css` | Static, always-algorithmic surfaces (Reels nav, Explore, ads badges, lives, shopping) + first-paint accent graying |
-| `content.js` (instagram) | Everything dynamic: suggested posts, whitelist scrub, feed-end / empty-feed banners, accent by geometry, redirects |
+| `sites/instagram.js` | Everything dynamic: suggested posts, whitelist scrub, feed-end / empty-feed banners, accent by geometry, redirects |
 
 **Rule learned the hard way:** CSS rules that try to hide suggested posts
 overlap with the JS logic and produce false positives (hiding followed posts).

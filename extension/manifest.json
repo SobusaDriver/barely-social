@@ -19,7 +19,7 @@
   "content_scripts": [
     {
       "matches": ["https://*.instagram.com/*"],
-      "js": ["content.js"],
+      "js": ["lib/sites.js", "lib/core.js", "sites/instagram.js"],
       "css": ["rules/instagram.css"],
       "run_at": "document_start",
       "all_frames": false
@@ -33,35 +33,35 @@
     },
     {
       "matches": ["https://*.youtube.com/*"],
-      "js": ["content.js"],
+      "js": ["lib/sites.js", "lib/core.js", "sites/youtube.js"],
       "css": ["rules/youtube.css"],
       "run_at": "document_start",
       "all_frames": false
     },
     {
       "matches": ["https://*.reddit.com/*"],
-      "js": ["content.js"],
+      "js": ["lib/sites.js", "lib/core.js", "sites/reddit.js"],
       "css": ["rules/reddit.css"],
       "run_at": "document_start",
       "all_frames": false
     },
     {
       "matches": ["https://*.linkedin.com/*"],
-      "js": ["content.js"],
+      "js": ["lib/sites.js", "lib/core.js", "sites/linkedin.js"],
       "css": ["rules/linkedin.css"],
       "run_at": "document_start",
       "all_frames": false
     },
     {
       "matches": ["https://*.tiktok.com/*"],
-      "js": ["content.js"],
+      "js": ["lib/sites.js", "lib/core.js", "sites/tiktok.js"],
       "css": ["rules/tiktok.css"],
       "run_at": "document_start",
       "all_frames": false
     }
   ],
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["lib/sites.js", "background.js"],
     "persistent": false
   },
   "action": {

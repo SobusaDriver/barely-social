@@ -137,7 +137,7 @@ Tres capas, en orden de profundidad:
 1. Scaffold con Xcode template de Safari Web Extension (cuenta dev ya contratada).
 2. Archivos de reglas: `instagram.css`, `youtube.css`, `reddit.css`, `linkedin.css`, `tiktok.css` + reglas `declarativeNetRequest` por sitio para red.
 3. Sal de listas públicas de filtros (uBlock ads/annoyance por sitio) adaptadas como punto de partida para los dos niveles.
-4. `content.js`: redirects (TikTok→/messages, IG→DMs opcional), overlay shield en surfaces bloqueadas, contador de allowance.
+4. `sites/<id>.js` (uno por web): redirects (TikTok→/messages, IG→DMs opcional), overlay shield en surfaces bloqueadas, contador de allowance.
 5. Popup de toolbar: 5 switches por sitio + allowance del día + toggle delay.
 6. Test manual por sitio: sin ads visibles, surfaces core funcionando; anotar selectores que se rompen con fecha.
 

@@ -36,7 +36,7 @@ they are all unreachable if you never land on them.
 - **DNR rule 901**: `^https?://(?:www\.)?linkedin\.com/(?:\?.*)?$` on
   `main_frame` → `https://www.linkedin.com/feed/network/`. Fires before any
   HTML, immune to SPA races.
-- **JS guard** (`content.js::linkedin`):
+- **JS guard** (`sites/linkedin.js`):
   ```js
   const IS_TARGET = /^\/feed\/network\/?$/.test(location.pathname);
   const NEEDS = pathname === "" || pathname === "/" ||

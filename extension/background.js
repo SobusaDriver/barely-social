@@ -1,5 +1,6 @@
 // BarelySocial MV3 background (non-persistent event page, Safari-compatible)
-const SITES = ["instagram", "youtube", "reddit", "linkedin", "tiktok"];
+// lib/sites.js corre antes (manifest: background.scripts) — lista única.
+const SITES = globalThis.BS_SITES.map((s) => s.id);
 
 const api = typeof browser !== "undefined" ? browser : chrome;
 
