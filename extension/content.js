@@ -261,12 +261,19 @@
           ent.remove(); changed = true;
         }
       }
+      // secciones que quedaron sin entradas (Explorar, Más de YouTube…)
       for (const sec of document.querySelectorAll(
         "ytd-guide-section-renderer, ytd-mini-guide-renderer"
       )) {
         if (!sec.querySelector("ytd-guide-entry-renderer, ytd-mini-guide-entry-renderer")) {
           sec.remove(); changed = true;
         }
+      }
+      // footer del guía (Acerca de, Prensa, Derechos de autor, etc.)
+      for (const f of document.querySelectorAll(
+        "ytd-guide-footer-renderer, ytd-mini-guide-footer-renderer"
+      )) {
+        f.remove(); changed = true;
       }
       return changed;
     };
