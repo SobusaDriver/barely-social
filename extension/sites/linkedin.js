@@ -25,6 +25,51 @@
     el.dataset.bsReason = reason;
   };
 
+  // Oculta el bloque cuyo título casa, subiendo solo mientras el padre siga
+  // empezando por ese mismo título (así no se come el panel de detalle).
+  const hideTitleBlock = (re, maxH) => {
+    for (const el of document.querySelectorAll("main p, main h2, main h3")) {
+      const title = (el.textContent || "").replace(/\s+/g, " ").trim();
+      if (!re.test(title)) continue;
+      let card = el;
+      for (let i = 0; i < 6 && card.parentElement; i++) {
+        const p = card.parentElement;
+        const pt = (p.textContent || "").replace(/\s+/g, " ").trim().toLowerCase();
+        if (p.getBoundingClientRect().height > maxH || !pt.startsWith(title.toLowerCase())) break;
+        card = p;
+      }
+      hide(card, "jobs-ad");
+    }
+  };
+
+  // Publicidad dentro del detalle de la oferta: "See jobs where you're a top
+  // applicant" y "Get personalized tips to stand out to hirers" (Premium).
+  const hideJobAds = () => {
+    hideTitleBlock(/^see jobs where you.re a top applicant$/i, 300);
+    hideTitleBlock(/^get personalized tips to stand out to hirers$/i, 300);
+    // slot por id: cubre variantes de copy
+    for (const el of document.querySelectorAll('[id^="JobDetails_PremiumApplicantInsights_"]')) {
+      hide(el, "jobs-ad");
+    }
+  };
+
+  // Home: si el rail derecho quedó vacío (puzzles/ads ocultos), el feed
+  // reclama ese ancho. La clase se pone en el grid de 24 columnas.
+  const reflowFeed = () => {
+    const list = document.querySelector('[data-testid="NetworkFeedListCollection"]');
+    const grid = list?.closest('section[aria-label="Primary content"]')?.parentElement;
+    if (!grid || window.innerWidth < 1024) {
+      document.querySelectorAll(".bs-wide-feed").forEach((g) => g.classList.remove("bs-wide-feed"));
+      return;
+    }
+    const aside = grid.querySelector(':scope > aside[aria-label="Aside"]');
+    if (!aside) return;
+    const hasContent = [...aside.querySelectorAll("*")].some(
+      (e) => e.offsetParent && e.getBoundingClientRect().height > 20
+    );
+    grid.classList.toggle("bs-wide-feed", !hasContent);
+  };
+
   // Ads, promos y relleno del feed/rail/My Network. "People you may know"
   // (en sus dos variantes) y "Suggestions for you" son personas reales: se
   // quedan.
@@ -73,11 +118,13 @@
     }
     // Jobs: panel de filtros avanzados + blocklists (solo en /jobs/*)
     if (onJobs()) {
+      hideJobAds();
       injectJobs();
       applyCardFilters();
     } else {
       injectJobs(); // limpia la UI al salir de /jobs
     }
+    reflowFeed();
   };
 
   // ---- Jobs: filtros avanzados ----
@@ -386,6 +433,7 @@
       };
     }
     addEventListener("popstate", route);
+    addEventListener("resize", () => { try { reflowFeed(); } catch {} });
     addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         const p = document.getElementById("bsj-panel");

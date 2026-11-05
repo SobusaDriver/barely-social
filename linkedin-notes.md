@@ -64,6 +64,11 @@ handles, cascade guards…) was defeated by three converging forces:
   mini-profile rail (which contains the link) can never be selected.
 - **Ad iframes** (`iframe[title="advertisement"]`, dynamic ads and the Ad
   Options preview) are hidden by CSS.
+- **Jobs**: the Premium applicant cards in the job detail panel — "See jobs
+  where you're a top applicant" and "Get personalized tips to stand out to
+  hirers" — are hidden by their leading text (bounded climb) plus the
+  `JobDetails_PremiumApplicantInsights_*` slots by id. The detail panel and the
+  job content are untouched.
 - **Messaging**: promotional conversations are hidden from the conversation
   list (`ul[aria-label="Conversation List"] > li`) when a row carries the exact
   label `Promoted`/`Promocionado`/`Sponsored`/`Patrocinado` or LinkedIn's own
@@ -107,6 +112,16 @@ Blocklist matching uses the card's `[role="button"]` container (the direct
 ancestor of the "Dismiss \<title\> job" button) and hides it with
 `display:none` + `data-bs-reason="jobs-block"`. It is reversible: clearing the
 list restores the cards. Values persist under the `jobs` storage key.
+
+### Home: responsive feed width
+The feed grid is 24 columns: profile rail (1–6), feed (7–16), right rail
+(17–24). Once the right rail is emptied (puzzles are hidden), the feed stays
+stuck at ~386 px and the rail keeps 304 px of blank space. `reflowFeed()`
+measures the aside's visible content on the feed page and, when empty, adds
+`.bs-wide-feed` to the grid; CSS then makes the feed span `7 / -1`, so the
+cards grow with the viewport (386 → 714 px at 1089 px wide, 840 px at 1600 px)
+and the empty rail disappears. The class is removed as soon as the aside has
+visible content again or the viewport drops below 1024 px (mobile layout).
 - Network-level LinkedIn ad hosts (`ads.linkedin.com`, `adg.linkedin.com`,
   `px.ads.linkedin.com`, …) are already blocked by the shared DNR ruleset.
 

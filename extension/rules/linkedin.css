@@ -19,3 +19,15 @@ iframe[title="advertisement"] {
 aside[aria-label="Aside"] > div:has(#feedRightNavGamesComponentRef) {
   display: none !important;
 }
+
+/* Home: cuando el rail derecho queda vacío (puzzles/ads ocultos), el feed
+   reclama sus columnas del grid de 24 → tarjetas responsive en vez de una
+   columna fija de ~386px. La clase la pone sites/linkedin.js midiendo el
+   contenido visible del aside. */
+.bs-wide-feed > section[aria-label="Primary content"] {
+  grid-column: 7 / -1 !important;
+}
+
+.bs-wide-feed > aside[aria-label="Aside"] {
+  display: none !important;
+}
