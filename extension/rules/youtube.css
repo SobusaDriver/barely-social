@@ -1,148 +1,48 @@
-/* Last verified: 2026-11-04 — selectors may drift when YouTube changes HTML */
+/* YouTube — CSS único y pequeño. Last verified: 2026-11-05
+   Principio: to / siempre cae en /feed/subscriptions (redirect en JS+DNR),
+   así que las reglas de home/chips/masthead son DEAD → fuera (YAGNI).
+   La lógica del guía ("solo Tú/Historial/Suscripciones") es JS+CSS dual:
+   JS prune (content.js, recarga en re-render) + esta pieza estática. */
 
-/* ===== Shorts ===== */
-
-/* Sidebar: la guía completa queda con "Tú", "Historial" y "Suscripciones".
-   Exact-match por href (estable) y no por nombre de tag (cambia en YT).
-   Se oculta toda sección del guía que no contenga esos links. */
+/* ---- Guía: secciones sin Suscripciones/Tú/Historial = fuera (incl. Shorts,
+   Explorar, Más de YouTube); footer del guía fuera ---- */
 ytd-guide-section-renderer:not(:has(a[href="/feed/subscriptions"], a[href^="/feed/you"], a[href^="/feed/history"])) {
   display: none !important;
 }
 ytd-mini-guide-renderer tp-yt-paper-item:not(:has(a[href="/feed/subscriptions"], a[href^="/feed/you"], a[href^="/feed/history"])),
 ytd-mini-guide-renderer ytd-mini-guide-entry-renderer:not(:has(a[href="/feed/subscriptions"], a[href^="/feed/you"], a[href^="/feed/history"])),
 ytd-guide-footer-renderer,
-ytd-mini-guide-footer-renderer,
-ytd-guide-entry-renderer[title*="Shorts" i],
-ytd-mini-guide-entry-renderer[title*="Shorts" i],
-ytd-guide-entry-renderer:has(a[href="/shorts"]),
-ytd-guide-entry-renderer:has(a#endpoint[title="Shorts"]) {
+ytd-mini-guide-footer-renderer {
   display: none !important;
 }
 
-/* Sección "Explorar" completa (Música, En vivo, Videojuegos, …) */
-ytd-guide-section-renderer:has(ytd-guide-entry-renderer[title="Música"]),
-ytd-guide-section-renderer:has(ytd-guide-entry-renderer[title="Trending"]) {
-  display: none !important;
-}
-
-/* Shorts pill button in the top-level nav / pivot bar */
-yt-chips-cloud-renderer + ytd-feed-filter-chip-bar-renderer yt-chip-cloud-chip-renderer:has(a[href*="/shorts"]),
-yt-chip-cloud-chip-renderer:has(yt-formatted-string[title="Shorts"]),
-#filters yt-chip-cloud-chip-renderer:has(> a[href*="/shorts"]) {
-  display: none !important;
-}
-
-/* Short video items in home grid and search results */
-ytd-rich-item-renderer:has(ytd-reel-video-renderer),
-ytd-video-renderer:has(ytd-thumbnail[href*="/shorts/"]),
+/* ---- Shorts: restos en grids y watch (home no existe: redirect) ---- */
 ytd-video-renderer:has(a[href*="/shorts/"]),
 ytd-grid-video-renderer:has(a[href*="/shorts/"]),
-ytd-rich-grid-renderer ytd-rich-section-renderer:has(ytd-rich-shelf-renderer a[href*="/shorts/"]) {
-  display: none !important;
-}
-
-/* Shorts shelf inside watch page suggestions */
-ytd-watch-next-secondary-results-renderer ytd-item-section-renderer:has(a[href*="/shorts/"]),
-ytd-secondary-results-renderer ytd-reel-shelf-renderer,
+ytd-rich-item-renderer:has(ytd-reel-video-renderer),
+ytd-rich-section-renderer:has(ytd-rich-shelf-renderer a[href*="/shorts/"]),
 ytd-reel-shelf-renderer,
+ytd-watch-next-secondary-results-renderer ytd-item-section-renderer:has(a[href*="/shorts/"]),
 #secondary ytd-shelf-renderer:has(ytd-reel-video-renderer) {
   display: none !important;
 }
 
-/* Shorts overlay player (full-screen shorts browsing) */
-ytd-app[is-browse-home-page-active] ytd-reel-video-stream-renderer,
-ytd-shorts-player-overlay-renderer {
-  display: none !important;
-}
-
-/* ===== Home feed: empty to essentially subscriptions only =====
-   Conservative: only hide shelves/heuristics that say "not from a subscription channel".
-   Never blanket-hide ytd-rich-grid-renderer or the whole home grid. */
-
-/* "Subscriptions" / "Recommended for you" / "Trending" shelf headers on home */
-ytd-rich-section-renderer:has(ytd-rich-shelf-renderer yt-formatted-string[aria-label*="Recommended" i]),
-ytd-rich-section-renderer:has(ytd-rich-shelf-renderer yt-formatted-string[title*="Recommended" i]),
-ytd-rich-section-renderer:has(ytd-rich-shelf-renderer yt-formatted-string[aria-label*="Trending" i]),
-ytd-rich-section-renderer:has(ytd-rich-shelf-renderer yt-formatted-string[aria-label*="Continue watching" i]),
-ytd-rich-section-renderer:has(ytd-rich-shelf-renderer yt-formatted-string[aria-label*="Shopping" i]),
-ytd-rich-section-renderer:has(ytd-rich-shelf-renderer ytd-ad-slot-renderer) {
-  display: none !important;
-}
-
-/* Generic "Recommended"-style promoted cards in home grid rows (only when marked recommended) */
-ytd-rich-item-renderer:has(#dismissible ytd-video-meta-block span[aria-label*="Recommended" i]) {
-  display: none !important;
-}
-
-/* Livestream "LIVE" suggested shelf rows */
-ytd-rich-section-renderer:has(ytd-live-chat-banner-renderer),
-ytd-watch-next-secondary-results-renderer ytd-item-section-renderer:has(ytd-video-renderer badge-shape div[aria-label="LIVE"]),
-#secondary ytd-shelf-renderer:has(ytd-video-renderer[is-live]) {
-  display: none !important;
-}
-
-/* Shopping tab (chips) + hidden commerce shelf */
-yt-chip-cloud-chip-renderer:has(a[href*="/storefront"]),
-ytd-rich-section-renderer:has(ytd-merch-shelf-renderer),
-ytd-merch-shelf-renderer,
-ytd-rich-shelf-renderer:has(ytd-badge-supported-renderer ytd-badge-shape[aria-label*="Shopping" i]) {
-  display: none !important;
-}
-
-/* ===== Ads ===== */
-
-/* Thumbnail ads promoted by YouTube */
+/* ---- Ads (búsqueda/watch; los ads in-en-player viajan en youtubei y los
+  desarma ads.js MAIN-world) ---- */
 ytd-promoted-video-renderer,
-.ytd-carousel-ad-renderer,
 ytd-promoted-sparkles-web-renderer,
 ytd-composite-ad-renderer,
 #player-ads,
-ytd-ad-slot-renderer {
-  display: none !important;
-}
-
-/* Masthead ad */
-ytd-masthead-ad,
+ytd-ad-slot-renderer,
 #masthead-ad,
 ytd-banner-promo-renderer {
   display: none !important;
 }
 
-/* ===== Watch page: "Up next" autoplay panel, end screens, info cards ===== */
-
-/* Up next / autoplay suggestion panel next to player */
-.ytd-horizontal-card-list-renderer,
+/* ---- Watch: upnext/autos, end-screens, cards ---- */
 ytd-horizontal-card-list-renderer,
-ytd-watch-next-secondary-results-renderer > ytd-compact-autoplay-renderer,
-#upnext,
-.upnext-buffer,
-.ytp-autonav-container {
+ytd-app .ytp-autonav-container,
+.ytp-endscreen-content, .ytp-ce-element,
+.ytp-cards-teaser, .ytp-paid-content-overlay {
   display: none !important;
 }
-
-/* End screen suggested-card overlays on the player */
-.ytp-endscreen-content,
-.ytp-endscreen-element,
-.ytp-ce-element,
-.ytp-autonav-endscreen-upnext-container,
-.ytp-endscreen-upnext {
-  display: none !important;
-}
-
-/* Info cards overlays on the player */
-.ytp-cards-teaser,
-.ytp-paid-content-overlay,
-.ytp-info-cards-button,
-.ytp-cards-button,
-.ytp-cards-teaser-show-container,
-.ytp-autohide .ytp-player-content.ytp-cards-teaser {
-  display: none !important;
-}
-
-/* ===== Comments (DEFAULT: OFF) =====
-   Default F-defaults: keep comments visible. Uncomment to hide. */
-/* ytd-comments#comments,
-#comments ytd-comment-thread-renderer,
-ytd-watch-metadata #comments-separator {
-  display: none !important;
-} */

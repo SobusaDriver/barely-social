@@ -18,12 +18,20 @@
   function loadState() {
     if (!api || !api.storage || !api.storage.local) return Promise.resolve();
     return api.storage.local
-      .get(["sites", "allowance"])
+      .get(["sites", "allowance", "following"])
       .then((r) => {
         state.sites = r.sites || {};
         state.allowance = r.allowance || {};
+        state._followingList = r.following || [];
       })
       .catch(() => {});
+  }
+
+  function chromeStorageSet(obj) {
+    if (!api || !api.storage || !api.storage.local) return Promise.resolve();
+    return api.storage.local.set(obj).then(() => {
+      if (obj.following) state._followingList = obj.following;
+    }).catch(() => {});
   }
 
   // ---- helpers ----
@@ -166,6 +174,9 @@
       let hit = false;
       if (el.tagName === "SVG") {
         hit = el.querySelector("linearGradient, radialGradient, stop") != null;
+      } else if (el.tagName === "CANVAS") {
+        // el anillo de historias de IG se dibuja en un canvas chico
+        hit = r.width <= 220 && r.height <= 220;
       } else {
         hit =
           /gradient/i.test(cs.backgroundImage) ||
@@ -195,24 +206,267 @@
       armReblock();
       return;
     }
+    // ---- whitelist de seguidos (escaneo del modal "Siguiendo") ----
+    // Único arbitro real de multi-creador: IG no expone "a quién sigo" en el
+    // DOM del feed, así que escaneamos el modal del perfil (una sola vez)
+    // y comparamos: cualquier creador NO seguido → post puesto unnecessary.
+    const ROUTES = new Set(["p", "reel", "reels", "tv", "explore", "direct", "stories", "challenge", "about"]);
+    const sanitizeHandle = (href) => {
+      const m = /^\/([A-Za-z0-9._]+)\/?(\?.*)?$/.exec(href || "");
+      const n = m && m[1].toLowerCase();
+      return n && !ROUTES.has(n) ? n : null;
+    };
+    // Scanner del modal "Siguiendo": auto-scroll hasta el final (la lista
+    // es paginada); persiste SOLO cuando dos rondas seguidas no traen nada
+    // nuevo — una lista parcial genera falsos "no seguido" y es excluir
+    // posts de gente que sí sigue (caso xataka). Sin escaneo completo:
+    // no hay lista, no hay scrub por whitelist.
+    const scanState = { tries: 0, idle: 0, el: null, cur: new Set() };
+    const scrollableOf = (modal) => {
+      let best = null;
+      for (const d of modal.querySelectorAll("div")) {
+        if (d.scrollHeight > d.clientHeight + 40) best = d;
+      }
+      return best || modal;
+    };
+    const scanFollowingModal = () => {
+      const modal = document.querySelector("div[role='dialog']");
+      if (!modal) { scanState.el = null; return false; }
+      if (scanState.el !== modal) { scanState.el = modal; scanState.tries = 0; scanState.idle = 0; scanState.cur.clear(); }
+      const names = new Set();
+      for (const a of modal.querySelectorAll("a[href]")) {
+        const n = sanitizeHandle(a.getAttribute("href"));
+        if (n) names.add(n);
+      }
+      for (const n of names) scanState.cur.add(n);
+      const scroller = scrollableOf(modal);
+      const done = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 30;
+      if (done || names.size === 0) {
+        scanState.idle += 1;
+        if (scanState.idle >= 2 && scanState.cur.size > 0) {
+          chromeStorageSet({ following: [...scanState.cur].sort() });
+          // deshacer la marca de "escaneo abierto" — el modal se cierra solo
+          scanState.el = null;
+          return true;
+        }
+      } else {
+        scanState.idle = 0;
+        scroller.scrollTop = Math.min(scroller.scrollTop + scroller.clientHeight, scroller.scrollHeight);
+      }
+      scanState.tries += 1;
+      if (scanState.tries > 400) { scanState.el = null; } // reincidencia límite
+      return true;
+    };
+    // ---- feed scrub con whitelist si existe; sin whitelist, heurística actual ----
+    const showEmptyFeed = () => {
+      if (!feedEnded) { feedEnded = true; document.documentElement.dataset.bsFeedEnd = "1"; }
+      if (feedEnded && !document.getElementById("bs-feed-empty")) {
+        const card = document.createElement("div");
+        card.id = "bs-feed-empty";
+        card.setAttribute("role", "status");
+        Object.assign(card.style, {
+          padding: "34px 22px", margin: "16vh auto", borderRadius: "12px",
+          maxWidth: "470px", textAlign: "center", background: "#161822",
+          color: "#9aa3af", font: "14px/1.5 -apple-system, system-ui, sans-serif",
+        });
+        card.textContent =
+          "Tu feed está vacío ahora mismo — nadie de tu lista ha publicado todavía. Es silencio real, no un error.";
+        const feed = document.querySelector("main article")?.parentElement
+          || document.querySelector("main section");
+        if (feed) feed.appendChild(card);
+      }
+    };
+    const scrubByWhitelist = () => {
+      const list = state._followingList;
+      if (!list || !list.length) return false;
+      const followed = new Set(list.map((s) => s.toLowerCase()));
+      let changed = false;
+      for (const art of document.querySelectorAll("article")) {
+        const aTop = art.getBoundingClientRect().top;
+        // creadores = SOLO los links de la zona de cabecera (primer ~140px
+        // del article). Los @mentions del caption/lista de tags están MÁS
+        // ABAJO y no cuentan — un post de tu gente con una mención a una
+        // cuenta que no sigues debe seguir viéndose.
+        const handles = [...art.querySelectorAll('a[href^="/"]')]
+          .filter((a) => {
+            const y = a.getBoundingClientRect().top - aTop;
+            return y >= -4 && y <= 140 && a.getBoundingClientRect().height <= 40;
+          })
+          .map((a) => sanitizeHandle(a.getAttribute("href")))
+          .filter(Boolean);
+        if (!handles.length) continue;
+        const followedInHeader = handles.some((h) => followed.has(h));
+        // regla: collab (≥2 creadores) si alguien sigue; single si el creador sigue
+        if (!followedInHeader) {
+          hide(art); art.dataset.bsReason = "not-followed";
+        }
+      }
+      // feed-end: cuando el scrub tapa el ÚLTIMO post no seguido, IG intenta
+      // rellenar en su lugar: showFeedEnd lo marca; se llama en el observer
+      // feed VACÍO real: cero articles visibles tras el scrub → aviso claro
+      const visibleArticles = [...document.querySelectorAll("main article")]
+        .filter((a) => !a.dataset.bsHidden && a.getBoundingClientRect().height > 0).length;
+      if (!feedEnded) {
+        if (visibleArticles === 0) showEmptyFeed();
+        else if (!document.querySelector("main article")) showFeedEnd();
+      }
+      if (feedEnded && visibleArticles === 0 && !document.getElementById("bs-feed-empty")) {
+        // IG puede borrar la card al re-renderizar el scroll: reinsertar
+        showEmptyFeed();
+      }
+      return;
+    };
+    // seguidos: OCULTAR (no remove — derribar DOM rompe React de IG y genera
+    // su error boundary "Something went wrong", que oculta posts reales).
+    // La frase se matchea exacta + debe existir botón Follow/Seguir en el
+    // article (firma de post sugerido; el caption de tu gente no lo tiene).
+    const phrase = new Set(["suggested for you", "sugerencias para ti", "sugerido para ti", "recommended for you", "ver más como este", "see more like this"]);
+    // firma de sugerido: botón "Follow"/"Seguir" REAL (por texto o aria) —
+    // tus posts nunca lo traen; los sugeridos siempre lo traen
+    const looksSuggested = (art) => {
+      for (const b of art.querySelectorAll('button, [role="button"]')) {
+        const l = ((b.getAttribute("aria-label") || b.textContent) || "").trim().toLowerCase();
+        if (l === "follow" || l === "seguir") return true;
+      }
+      return false;
+    };
+    const hide = (art) => {
+      art.style.setProperty("display", "none", "important");
+      art.dataset.bsHidden = "1";
+    };
+    let feedEnded = false;
+    // fin de feed visible y verde: cuando el algoritmo intenta rellenar,
+    // BarelySocial declara el fin de tu contenido y detiene el scroll infinito
+    const showFeedEnd = () => {
+      feedEnded = true;
+      // flag persistente (sobrevive reciclos de DOM de IG) + mata los loaders
+      document.documentElement.dataset.bsFeedEnd = "1";
+      for (const sp of document.querySelectorAll('main [role="progressbar"], main svg[role="progressbar"]')) {
+        sp.style.setProperty("display", "none", "important");
+      }
+      if (document.getElementById("bs-feed-end")) return;
+      // ancla estable: el contenedor real del feed es el padre del 1er article
+      const feed = document.querySelector("main article")?.parentElement;
+      if (!feed) return;
+      const card = document.createElement("div");
+      card.id = "bs-feed-end";
+      card.setAttribute("role", "status");
+      Object.assign(card.style, {
+        padding: "28px 20px", margin: "12px auto 40px", borderRadius: "12px",
+        maxWidth: "470px", textAlign: "center", background: "#161822",
+        color: "#9aa3af", font: "14px/1.5 -apple-system, system-ui, sans-serif",
+      });
+      card.textContent =
+        "Llegaste al final de tu feed de seguidos. Instagram quería rellenarlo con sugerencias — BarelySocial lo frenó.";
+      // botón de cortesía: volver arriba, que es donde vive el contenido real
+      const btn = document.createElement("button");
+      btn.textContent = "Volver arriba ↑";
+      Object.assign(btn.style, {
+        display: "block", margin: "10px auto 0", padding: "8px 18px",
+        borderRadius: "8px", border: "1px solid #2a2f3a", background: "transparent",
+        color: "#c9ced6", font: "inherit", cursor: "pointer",
+      });
+      btn.onclick = () => {
+        // IG scrollea en un contenedor interno (window.scrollY=0): buscar el
+        // primer scrollable real y subirlo; fallback window.scrollTo
+        let sc = null;
+        for (const d of document.querySelectorAll("main div")) {
+          if (d.scrollHeight > d.clientHeight + 60) { sc = d; break; }
+        }
+        if (sc) sc.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      };
+      card.appendChild(btn);
+      feed.appendChild(card);
+      feedEnded = true;
+      // pin permanente: la tarjeta VIAJA al final del feed y cualquier
+      // article que IG apile DESPUÉS de ella se oculta (anti scroll infinito)
+      window.enforceFeedEnd = () => {
+        const c = document.getElementById("bs-feed-end");
+        if (!c || !c.parentElement) return;
+        c.parentElement.appendChild(c); // re-pin al fondo del feed
+        let seen = false;
+        for (const child of Array.from(c.parentElement.children)) {
+          if (child === c) { seen = true; continue; }
+          if (seen && child.tagName === "ARTICLE") {
+            child.style.setProperty("display", "none", "important");
+            child.dataset.bsHidden = "1";
+            child.dataset.bsReason = "post-feed-end";
+          }
+        }
+      };
+      enforceFeedEnd();
+      // banner en cuanto alcance el fondo del scroll interno (el trigger
+      // humano: llegaste hasta abajo = fin de tu contenido)
+      const scr = () => {
+        for (const d of document.querySelectorAll("main div")) {
+          if (d.scrollHeight > d.clientHeight + 60) {
+            if (d.scrollTop + d.clientHeight >= d.scrollHeight - 200) {
+              showFeedEnd();
+              enforceFeedEnd();
+            }
+            break;
+          }
+        }
+      };
+      addEventListener("scroll", () => { try { scr(); } catch {} }, { passive: true });
+    };
+    const pruneSuggested = () => {
+      let changed = false;
+      for (const el of document.querySelectorAll("span, div, h2")) {
+        const t = (el.textContent || "").trim().toLowerCase();
+        if (!phrase.has(t) || !el.offsetParent) continue;
+        //  (a) <article> con botón Seguir/Follow (sugeridos a mitad del feed)
+        //  (b) bloque grande (≥380px) con el heading exacto (fin-de-feed)
+        const art = el.closest("article") || el.closest("[role='article']") || el.closest("[role='presentation']");
+        if (art) {
+          if (!art.dataset.bsHidden && looksSuggested(art)) {
+            hide(art); changed = true;
+            if (!feedEnded) showFeedEnd();
+          }
+          continue;
+        }
+        // (b): escalar al ancestro alto-más, que envuelve TODAS las tarjetas
+        let block = el.parentElement;
+        for (let i = 0; i < 8 && block; i++) {
+          if (block.getBoundingClientRect().height >= 380) {
+            if (!block.dataset.bsHidden) {
+              hide(block); changed = true;
+              if (!feedEnded) showFeedEnd();
+            }
+            break;
+          }
+          block = block.parentElement;
+        }
+      }
+      // auto-reparación: si un post oculto NO tiene firma de sugerido
+      // (ocurre cuando IG re-renderiza el DOM tras hide), se restaura
+      for (const art of document.querySelectorAll('[data-bs-hidden="1"]')) {
+        const t = (art.textContent || "").toLowerCase();
+        if (!looksSuggested(art) && !/suggested|sugerid/.test(t)) {
+          art.style.removeProperty("display");
+          delete art.dataset.bsHidden; changed = true;
+        }
+      }
+      return changed;
+    };
+    retry(pruneSuggested);
+    retry(scrubByWhitelist);
+    retry(scanFollowingModal);
+    let igTimer = null;
+    new MutationObserver(() => {
+      if (igTimer) return;
+      igTimer = setTimeout(() => {
+        igTimer = null;
+      for (const n of [pruneSuggested, scrubByWhitelist, neutralizeAccent, scanFollowingModal]) {
+        try { n(); } catch {}
+      }
+      if (feedEnded && window.enforceFeedEnd) { try { window.enforceFeedEnd(); } catch {} }
+    }, 150);
+    }).observe(document.body, { childList: true, subtree: true });
     // acento neutro: anillos de historias, badges de notificación, iconos con
     // gradiente rosa/rojo de IG → escala de grises (CSS no puede matchear color)
     retry(() => { neutralizeAccent(); return true; });
-    // afectado de re-scan: primer cycle inmediato y re-debounce corto (120ms)
-    const accentObs = new MutationObserver((_, obs) => {
-      // primer cambio → corre YA (sin debounce) para cubrir el primer paint
-      try { neutralizeAccent(); } catch {}
-      obs.disconnect();
-      // a partir de aquí, debounce 120 ms
-      let t = null;
-      const fast = new MutationObserver(() => {
-        if (t) return;
-        t = setTimeout(() => { t = null; try { neutralizeAccent(); } catch {} }, 120);
-      });
-      fast.observe(document.body, { childList: true, subtree: true });
-      obs.disconnect();
-    });
-    accentObs.observe(document.body, { childList: true, subtree: true });
     // home → asegurar pestaña "Siguiendo"
     if (location.pathname === "/" || location.pathname === "") {
       retry(() => {

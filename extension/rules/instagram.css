@@ -1,130 +1,61 @@
-/* Última verificación: 2026-11-05 — los selectores pueden romperse cuando Instagram cambie su HTML */
-/* SocialLite parity for instagram.com. Hide-only, fail-open. */
+/* Instagram — CSS único y pequeño. Last verified: 2026-11-05
+   Principio: CSS solo para superficies SIEMPRE-algorítmicas (fallo-open).
+   La lógica de sugeridos/ads/collabs vive en content.js (único dueño:
+   un solo motor para evitar colisiones DRY/KISS). */
 
-/* ---------- Reels: nav items (sidebar + bottom bar) ---------- */
+/* Reels: solo nav y modal (los reels de seguidos en el feed NO se tocan) */
 a[href="/reels/"],
-a[href^="/reels/"],
-svg[aria-label="Reels"],
-[aria-label="Reels"] {
+div[role="dialog"]:has(a[href^="/reels/"]) {
   display: none !important;
 }
 
-/* Reels: trays/sections injected into the home feed */
-section:has(> div > a[href^="/reels/"]),
-[role="presentation"]:has(> a[href^="/reels/"]) {
-  display: none !important;
-}
-
-/* Reels: watch modal/overlay (hide without breaking layout beneath) */
-div[role="dialog"]:has(a[href^="/reels/"]),
-div[style*="overflow"]:has(> div > a[href^="/reels/"]) {
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
-/* ---------- Explore page & suggested search ---------- */
+/* Explore + buscador sugerido */
 a[href="/explore/"],
-[aria-label="Explorar"],
-[aria-label="Explore"],
-[aria-label="Buscar"],
-[aria-label="Search"],
-input[placeholder*="Buscar" i],
-input[placeholder*="Search" i] {
+[aria-label="Explorar"], [aria-label="Explore"],
+[aria-label="Buscar"], [aria-label="Search"],
+input[placeholder*="Buscar" i], input[placeholder*="Search" i] {
   display: none !important;
 }
 
-/* ---------- Livestream indicators & live sections in feed ---------- */
-svg[aria-label*="En directo" i],
-svg[aria-label*="Live" i],
-[aria-label*="En directo" i],
-[aria-label*="is live" i],
-[aria-label*="Iglesia en vivo" i] {
-  display: none !important;
-}
-
+/* Lives */
 article:has(svg[aria-label*="En directo" i]),
 article:has(svg[aria-label*="Live" i]) {
   display: none !important;
 }
 
-/* ---------- Shopping surfaces ---------- */
-a[href^="/shop/"],
-a[href*="/checkout"] {
-  display: none !important;
-}
-
-[aria-label*="Tienda" i],
-[aria-label*="Shop" i],
-[aria-label*="Ver producto" i],
-[aria-label*="View product" i],
-[aria-label*="Productos" i],
-[aria-label*="Products" i] {
-  display: none !important;
-}
-
-/* Product sticker overlay inside posts */
+/* Shopping */
+a[href^="/shop/"], a[href*="/checkout"],
 article:has(span[aria-label*="Ver producto" i]),
 article:has(span[aria-label*="View product" i]) {
   display: none !important;
 }
 
-/* ---------- Ads & "Suggested for you"/follow suggestions in feed ---------- */
-/* Instagram marks promoted posts with a visible heading span; conservative attr match */
+/* Ads con sello ("Patrocinado"/"Sponsored") — el resto va por JS */
 article:has([aria-label*="patrocinado" i]),
-article:has([aria-label*="Sponsored" i]),
-[aria-label*="Sugerencias para ti" i],
-[aria-label*="Suggested for you" i],
-[aria-label*="Suggested" i][role="button"] {
+article:has([aria-label*="Sponsored" i]) {
   display: none !important;
 }
 
-/* Suggestion blocks (follow recommendations) */
-article:has([aria-label*="Sugerir" i][role="button"]),
-article:has(button[aria-label*="Seguir"][tabindex]),
-div:has(> div > div > [aria-label*="Sugerencias" i]) {
-  display: none !important;
-}
-
-/* Suggestions row — "Cuéntale a tus amigos" style cards */
+/* Fila de sugerencias de amigos ("Cuéntale a tus amigos") */
 section:has(> div > [aria-label*="Cuéntale" i]),
-[aria-label*="Cuéntale a tus amigos" i],
-[aria-label*="Tell your friends" i] {
+[aria-label*="Cuéntale a tus amigos" i] {
   display: none !important;
 }
 
-/* Non-followed posts: heading-based detection via aria-label heuristics only */
-article:has([aria-label*="Ver más como este" i]),
-article:has([aria-label*="See more like this" i]) {
+/* Fin de feed: loaders de la cola desaparecen bajo este flag del JS */
+:root[data-bs-feed-end] main [role="progressbar"],
+:root[data-bs-feed-end] main svg[role="progressbar"] {
   display: none !important;
 }
-
-/* ---------- Saved-posts prompts ---------- */
-[aria-label*="_guardado" i],
-[aria-label*="Saved" i][role="dialog"],
-[aria-label*="Guardado" i][role="dialog"] {
-  display: none !important;
-}
-
-/* ---------- Kept (do-not-touch): Following feed, Stories, DMs, profile — explicit, no selectors needed here, just no blanket hides above ---------- */
 
 /* ---------- Acento neutro (gris) ----------
-   Instagram pinta el acento con gradientes inline (anillos de historias,
-   badges, íconos): CSS lo cubre instantánea por atajo de atributo del style.
-   El gris se aplica al primer paint, sin esperar al JS. */
+   Primer paint por atributo/canvas; el resto lo completa neutro JS. */
 [style*="radient" i],
-[style*="fdf497" i],
-[style*="ff0069" i],
-[style*="255, 48" i],
 svg:has(linearGradient),
 svg:has(radialGradient),
-svg:has(stop[stop-color]),
-svg [stroke*="url(#"],
-[data-ba*="gradient"] {
+ul canvas {
   filter: grayscale(1) brightness(0.9) !important;
 }
-/* excepción: no grayscalear contenido real (fotos/vídeos) */
-img, video,
-[style*="gradient"] img,
-[style*="gradient"] video {
+img, video {
   filter: none !important;
 }
