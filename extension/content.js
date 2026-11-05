@@ -252,14 +252,19 @@
     // (Principal, Shorts, Tú, Historial, Explorar, Más de YouTube…) fuera.
     const pruneGuide = () => {
       let changed = false;
-      for (const ent of document.querySelectorAll("ytd-guide-entry-renderer")) {
+      // guía expandida + miniguía colapsada (sidebar de iconos)
+      for (const ent of document.querySelectorAll(
+        "ytd-guide-entry-renderer, ytd-mini-guide-entry-renderer"
+      )) {
         const t = (ent.textContent || "").trim();
         if (!/suscripciones|subscriptions/i.test(t)) {
           ent.remove(); changed = true;
         }
       }
-      for (const sec of document.querySelectorAll("ytd-guide-section-renderer")) {
-        if (!sec.querySelector("ytd-guide-entry-renderer")) {
+      for (const sec of document.querySelectorAll(
+        "ytd-guide-section-renderer, ytd-mini-guide-renderer"
+      )) {
+        if (!sec.querySelector("ytd-guide-entry-renderer, ytd-mini-guide-entry-renderer")) {
           sec.remove(); changed = true;
         }
       }
