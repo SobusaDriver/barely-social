@@ -2,61 +2,182 @@
   {
     "id": 1,
     "priority": 10,
-    "action": { "type": "block" },
+    "action": {
+      "type": "block"
+    },
     "condition": {
-      "initiatorDomains": ["instagram.com"],
-      "requestDomains": ["adsinstagram.com", "an.facebook.com"],
-      "resourceTypes": ["main_frame", "sub_frame", "script", "image", "xmlhttprequest", "ping", "other"]
+      "initiatorDomains": [
+        "instagram.com"
+      ],
+      "requestDomains": [
+        "adsinstagram.com",
+        "an.facebook.com"
+      ],
+      "resourceTypes": [
+        "main_frame",
+        "sub_frame",
+        "script",
+        "image",
+        "xmlhttprequest",
+        "ping",
+        "other"
+      ]
     }
   },
   {
     "id": 2,
     "priority": 10,
-    "action": { "type": "block" },
+    "action": {
+      "type": "block"
+    },
     "condition": {
-      "initiatorDomains": ["youtube.com"],
-      "requestDomains": ["doubleclick.net", "googlesyndication.com", "googleadservices.com", "s0.2mdn.net", "2mdn.net"],
-      "resourceTypes": ["script", "image", "xmlhttprequest", "ping", "sub_frame", "other"]
+      "initiatorDomains": [
+        "youtube.com"
+      ],
+      "requestDomains": [
+        "doubleclick.net",
+        "googlesyndication.com",
+        "googleadservices.com",
+        "s0.2mdn.net",
+        "2mdn.net"
+      ],
+      "resourceTypes": [
+        "script",
+        "image",
+        "xmlhttprequest",
+        "ping",
+        "sub_frame",
+        "other"
+      ]
     }
   },
   {
     "id": 3,
     "priority": 10,
-    "action": { "type": "block" },
+    "action": {
+      "type": "block"
+    },
     "condition": {
-      "initiatorDomains": ["reddit.com"],
-      "requestDomains": ["ads.reddit.com", "adscdn.reddit-media.com", "events.redditmedia.com"],
-      "resourceTypes": ["script", "image", "xmlhttprequest", "ping", "sub_frame", "other"]
+      "initiatorDomains": [
+        "reddit.com"
+      ],
+      "requestDomains": [
+        "ads.reddit.com",
+        "adscdn.reddit-media.com",
+        "events.redditmedia.com"
+      ],
+      "resourceTypes": [
+        "script",
+        "image",
+        "xmlhttprequest",
+        "ping",
+        "sub_frame",
+        "other"
+      ]
     }
   },
   {
     "id": 4,
     "priority": 10,
-    "action": { "type": "block" },
+    "action": {
+      "type": "block"
+    },
     "condition": {
-      "initiatorDomains": ["linkedin.com"],
-      "requestDomains": ["ads.linkedin.com", "adg.linkedin.com", "px.ads.linkedin.com", "pxads.linkedin.com", "s.ads.linkedin.com"],
-      "resourceTypes": ["script", "image", "xmlhttprequest", "ping", "sub_frame", "other"]
+      "initiatorDomains": [
+        "linkedin.com"
+      ],
+      "requestDomains": [
+        "ads.linkedin.com",
+        "adg.linkedin.com",
+        "px.ads.linkedin.com",
+        "pxads.linkedin.com",
+        "s.ads.linkedin.com"
+      ],
+      "resourceTypes": [
+        "script",
+        "image",
+        "xmlhttprequest",
+        "ping",
+        "sub_frame",
+        "other"
+      ]
     }
   },
   {
     "id": 5,
     "priority": 10,
-    "action": { "type": "block" },
+    "action": {
+      "type": "block"
+    },
     "condition": {
-      "initiatorDomains": ["tiktok.com"],
-      "requestDomains": ["ads.tiktok.com", "log-ads.tiktok.com", "analytics.tiktok.com", "ad.tiktok.com", "log.byteoversea.com", "appsflyer.com", "onelink.appsflyer.com"],
-      "resourceTypes": ["script", "image", "xmlhttprequest", "ping", "sub_frame", "other"]
+      "initiatorDomains": [
+        "tiktok.com"
+      ],
+      "requestDomains": [
+        "ads.tiktok.com",
+        "log-ads.tiktok.com",
+        "analytics.tiktok.com",
+        "ad.tiktok.com",
+        "log.byteoversea.com",
+        "appsflyer.com",
+        "onelink.appsflyer.com"
+      ],
+      "resourceTypes": [
+        "script",
+        "image",
+        "xmlhttprequest",
+        "ping",
+        "sub_frame",
+        "other"
+      ]
     }
   },
   {
     "id": 6,
     "priority": 5,
-    "action": { "type": "block" },
+    "action": {
+      "type": "block"
+    },
     "condition": {
-      "requestDomains": ["google-analytics.com", "googletagmanager.com", "doubleclick.net", "scorecardresearch.com", "app-measurement.com", "branch.io"],
-      "initiatorDomains": ["instagram.com", "youtube.com", "reddit.com", "linkedin.com", "tiktok.com"],
-      "resourceTypes": ["script", "image", "xmlhttprequest", "ping", "sub_frame", "other"]
+      "requestDomains": [
+        "google-analytics.com",
+        "googletagmanager.com",
+        "doubleclick.net",
+        "scorecardresearch.com",
+        "app-measurement.com",
+        "branch.io"
+      ],
+      "initiatorDomains": [
+        "instagram.com",
+        "youtube.com",
+        "reddit.com",
+        "linkedin.com",
+        "tiktok.com"
+      ],
+      "resourceTypes": [
+        "script",
+        "image",
+        "xmlhttprequest",
+        "ping",
+        "sub_frame",
+        "other"
+      ]
+    }
+  },
+  {
+    "id": 900,
+    "priority": 10,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "url": "https://www.youtube.com/feed/subscriptions"
+      }
+    },
+    "condition": {
+      "regexFilter": "^https?://(?:www\\.)?youtube\\.com/(?:\\?.*)?$",
+      "resourceTypes": [
+        "main_frame"
+      ]
     }
   }
 ]
