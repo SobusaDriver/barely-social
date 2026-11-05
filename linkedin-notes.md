@@ -2,74 +2,89 @@
 
 ## What BarelySocial does here
 
-LinkedIn is intentionally the **smallest surface** in the project: the only
-behavior kept, after multiple rounds of iteration and rollback, is a
-**landing redirect to My Network**. Everything else — feed hiding, junk
-cards, whitelists, cascade guards — was implemented, tested live, and then
-**deliberately removed from the codebase and from git history**.
+LinkedIn is kept intentionally small: the app is a **My Network reader**, never
+the algorithmic feed. Three behaviors only:
+
+1. Landing/route redirect to `/feed/network/` (home and the "For you" tab).
+2. Feed advertising removed (`Promoted` cards).
+3. LinkedIn's own promo units removed (Premium upsell, ad iframes).
+
+Everything else — feed rewriting, junk cards, whitelists, cascade guards — was
+implemented, tested live, and then **deliberately removed from the codebase and
+from git history**.
 
 ## Design history: why it collapsed to a redirect
 
 The full attempt (hide feed cards, separate asides, whitelist of followed
 handles, cascade guards…) was defeated by three converging forces:
 
-1. **Obfuscated, rotating facade.** LinkedIn now ships atomic `fa4*` classes
-   that change per deploy; the previous generation referenced
+1. **Obfuscated, rotating facade.** LinkedIn ships atomic `fa4*` classes that
+   change per deploy; the previous generation referenced
    `scaffold-finite-scroll__content`, `[data-urn]`, `[data-test-id]` — none
-   exist anymore. The one stable semantic anchor found was the exact-text
-   `h2 "Feed post"` label per post card.
+   exist anymore. The stable semantic anchors are text content
+   (`h2 "Feed post"`, label `"Promoted"`) and `role` attributes.
 2. **Cascading hides.** Hiding "the smallest block containing X" measured
    during partial renders caught page-level wrappers, collapsing the whole
-   viewport to white. The cascade guard (parent ≥ +150 px larger) fixed the
-   mechanics but not the cost of keeping such logic correct across builds.
+   viewport to white. Only fixed, self-contained targets are hidden now, and
+   never with an unbounded climb.
 3. **False-positive contact surface** (e.g. "Analytics"/"Post impressions"
-   links inside the user's own mini-profile rail) kept disputing the rules:
-   every generic stamp turned into a fight over your own profile card.
-
-Under the KISS / DRY / YAGNI pass the verdict was: **the redirect is all of
-the value at ~0 % of the fragility**. Feed, promoted cards, games, puzzles —
-they are all unreachable if you never land on them.
+   links inside the user's own mini-profile rail). Every generic stamp turned
+   into a fight over your own profile card — the Premium upsell hide therefore
+   is bounded so it can never swallow the mini-profile.
 
 ## Final behavior (kept)
 
 ### Redirect to My Network
 - **DNR rule 901**: `^https?://(?:www\.)?linkedin\.com/(?:\?.*)?$` on
-  `main_frame` → `https://www.linkedin.com/feed/network/`. Fires before any
-  HTML, immune to SPA races.
-- **JS guard** (`sites/linkedin.js`):
+  `main_frame` → `https://www.linkedin.com/feed/network/`.
+- **DNR rule 902**: `/feed/foryou…` (`main_frame`) → `/feed/network/`, so the
+  algorithmic feed never even loads on a cold navigation.
+- **JS guard** (`sites/linkedin.js`) — surfaces only, never individual posts:
   ```js
-  const IS_TARGET = /^\/feed\/network\/?$/.test(location.pathname);
-  const NEEDS = pathname === "" || pathname === "/" ||
-    (pathname.startsWith("/feed") && !IS_TARGET);
-  if (NEEDS) location.replace("https://www.linkedin.com/feed/network/");
+  const isFeedSurface = (p) =>
+    p === "" || p === "/" || p === "/feed" || p === "/feed/" ||
+    /^\/feed\/foryou\b/.test(p);
   ```
-- **Anti-loop fix** (root of the one critical bug of this surface): `/feed/network/`
-  itself starts with `/feed` — without the `IS_TARGET` exclusion the redirect
-  re-fired against its own landing, reload-looping forever.
+  `/feed/update/…` (a post) is content and stays reachable.
+- **SPA watcher**: the "For you" tab is a client-side route — LinkedIn calls
+  `history.pushState` to `/feed/foryou/` without a network request (verified
+  live). `pushState`/`replaceState`/`popstate` are wrapped and re-run `route()`.
+  Without it, the redirect only worked on full reloads.
 
-### Intentional non-goals (removed by the user's decision)
-- Hiding the home feed row by row.
-- Cards: "Today's puzzles" (`#feedRightNavGamesComponentRef`), "Add to your
-  feed", Analytics/"People who viewed your profile", Premium "Get hired
-  up to…" (`upsellSlotId=IDENTITY_MODULE`), "Promoted" chip cards, the
-  LinkedIn Corporation footer.
-- Mini-profile rail protection / auto-repair links.
-- All of these selectors existed and were verified against the live DOM —
-  they live in the repository history (squashed away at commit `4eb2013`).
-  They can be resurrected from there if the product decision changes; the
-  notes preserved the exact names for that purpose.
+### Advertising
+- **Feed ads**: the ad post carries the exact label `Promoted` (or
+  `Promocionado`) in its header. `hideAds()` finds it with XPath
+  (`normalize-space()='Promoted'`) and hides the enclosing
+  `[role="listitem"]` with `display:none` + `data-bs-hidden`. The list is
+  virtualized, so the node exists even when offscreen; hiding (never removing)
+  keeps React's reconciliation intact.
+- **Premium upsell** (`upsellSlotId=IDENTITY_MODULE`): the `<a href>` is hidden
+  immediately by CSS; JS climbs only through ancestors whose text is **exactly
+  the anchor's text**, so the 74 px upsell block disappears and the
+  mini-profile rail (which contains the link) can never be selected.
+- **Ad iframes** (`iframe[title="advertisement"]`, dynamic ads and the Ad
+  Options preview) are hidden by CSS.
+- Network-level LinkedIn ad hosts (`ads.linkedin.com`, `adg.linkedin.com`,
+  `px.ads.linkedin.com`, …) are already blocked by the shared DNR ruleset.
+
+### Intentional non-goals
+- Hiding the home feed row by row (unreachable by redirect).
+- "Today's puzzles" (`#feedRightNavGamesComponentRef`), "Add to your feed",
+  Analytics/"People who viewed your profile", the LinkedIn Corporation footer:
+  not advertising per the product decision — left visible.
+- Mini-profile rail protection beyond the bounded upsell climb.
 
 ## Practical context / gotchas
-- `rules/linkedin.css` is kept as an (almost-empty) file because the manifest
-  references it; its only content is documentation pointing at this file and
-  the kept redirect.
-- LinkedIn's own router may internally normalize `feed/network` to other
-  sub-routes (e.g. `/mynetwork/grow/…`) — that is fine: the redirect itself
-  never loops because it excludes its destination.
-- If LInkIn/UI classes change again, prefer semantic anchors verified from
-  DevTools **on the network-request level** (the DNR list also cleaned
-  trackers) before adding any hide-by-content rule; climbing logic is what
-  made this surface expensive.
+- `rules/linkedin.css` holds only stable `href`/`title` anchors so the first
+  paint is clean; everything text-anchored lives in `sites/linkedin.js`.
+- LinkedIn's own router may normalize `feed/network` to other sub-routes
+  (`/mynetwork/grow/…`) — fine: the redirect excludes its destination, so it
+  never loops.
+- The "For you" / "Network" tabs are two routes on the same page
+  (`/feed/foryou/` and `/feed/network/`); the tab switch is `pushState`, not a
+  reload. That is the reason the SPA watcher is mandatory.
+- The feed list is virtualized: ad cards can be present with `height: 0` while
+  offscreen. Anchor on text/role, never on geometry.
 - Testing is done through **real-browser-mcp** against the logged-in profile
-  (the same architecture working for all other surfaces); the history rewrite
-  made sure only the final state is distributed.
+  (same architecture as every other surface); the history rewrite made sure
+  only the final state is distributed.

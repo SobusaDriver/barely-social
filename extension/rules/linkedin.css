@@ -1,3 +1,14 @@
-/* LinkedIn — sin reglas activas por decisión explicita del autor.
-   Único cambio conservado del proyecto: el redirect a /feed/network/
-   (definido en sites/linkedin.js y en dnr.json regla 901). */
+/* LinkedIn — CSS mínimo. Last verified: 2026-11-05
+   El redirect a My Network y el hide de ads viven en sites/linkedin.js
+   (las clases fa4* rotan por build; el ad se ancla por texto "Promoted").
+   Aquí solo anclas estables de href/título, para matar el flash. */
+
+/* upsell de Premium (ancla exacta) */
+a[href*="upsellSlotId=IDENTITY_MODULE"] {
+  display: none !important;
+}
+
+/* unidades de anuncio servidas en iframe (dynamic ads / preview de Ad Options) */
+iframe[title="advertisement"] {
+  display: none !important;
+}
