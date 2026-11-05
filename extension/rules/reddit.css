@@ -6,6 +6,10 @@
 nav a[href="/popular"],
 nav a[href="/news"],
 nav a[href="/explore"],
+a[href="/r/popular"],
+a[href="/r/all"],
+a[href="/r/news"],
+a[href="/r/explore"],
 a[href="/popular"][slot],
 #left-sidebar a[href="/popular"],
 #left-sidebar a[href="/news"],
@@ -128,5 +132,40 @@ aside[class*="ad"],
 div[aria-label="advertisement"],
 div[data-testid="ad-unit"],
 div[data-adserver-temporary-id] {
+  display: none !important;
+}
+
+/* ================= Right rail: discovery & promos ================= */
+/* "Discover communities", "People also ask", "Related posts" (listado infinito
+   de otros posts) y Promotion son descubrimiento/ads. Al quedar vacío, el
+   rail se colapsa y el feed usa todo el ancho (sites/reddit.js). */
+aside[aria-label="Discover communities"],
+aside[aria-label="Promotion"],
+aside[aria-label="People also ask about section"],
+aside[aria-label="Related Posts Section"],
+aside[aria-label*="Trending"],
+aside[aria-label*="Top communities"],
+aside[aria-label*="Related communities"],
+#right-rail-experience-root,
+#right-rail-entity-panel-root:empty,
+[data-testid*="trending"],
+[data-testid*="top-communities"],
+shreddit-comment[promoted] {
+  display: none !important;
+}
+
+/* Links de suscripción/upsell que no aportan al uso */
+a[href="/premium"],
+a[href*="/premium/"],
+a[href="/coins"],
+a[href*="/coins/"] {
+  display: none !important;
+}
+
+/* ================= Feed responsive (clase puesta por JS) ================= */
+.bs-reddit-wide {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+.bs-reddit-wide > .right-sidebar {
   display: none !important;
 }
