@@ -377,5 +377,19 @@
   const handlers = { instagram, youtube, reddit, linkedin, tiktok };
   loadState().catch(() => {}).then(() => {
     try { handlers[site](); } catch {} // nunca romper el sitio
+    // SPA: las redes cambian de ruta con pushState/replaceState (sin request
+    // de red) — en YouTube eso permitiría que el home reaparezca sin que el
+    // redirect del home (DNR) se entere. Re-disparo el handler en cada cambio.
+    if (site === "youtube") {
+      ["pushState", "replaceState"].forEach((f) => {
+        const orig = history[f];
+        history[f] = function (...a) {
+          const r = orig.apply(this, a);
+          setTimeout(() => { try { handlers[site](); } catch {} }, 60);
+          return r;
+        };
+      });
+      addEventListener("popstate", () => { try { handlers[site](); } catch {} });
+    }
   });
 })();
