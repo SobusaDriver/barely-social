@@ -66,6 +66,9 @@ better than class-based DOM, so almost all behavior lives in CSS.
   by `sites/reddit.js` and re-evaluated on navigation/resize.
 
 ## Practical context / gotchas
+- Verified live on 2026-11-05 with a logged-in session: home lands on
+  **Following**, `#feed-tab-1` (For You) is hidden, the right rail is collapsed
+  and the feed measures **1057 px** at a 1089 px viewport.
 - Reddit's rendering pipeline (web components + faceplate) means most class
   churn is harmless; the `shreddit-*` tags are the stability contract.
 - No whitelist needed here: "joined" is a visible filter Reddit itself

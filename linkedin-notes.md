@@ -3,15 +3,21 @@
 ## What BarelySocial does here
 
 LinkedIn is kept intentionally small: the app is a **My Network reader**, never
-the algorithmic feed. Three behaviors only:
+the algorithmic feed. What BarelySocial does here:
 
-1. Landing/route redirect to `/feed/network/` (home and the "For you" tab).
-2. Feed advertising removed (`Promoted` cards).
-3. LinkedIn's own promo units removed (Premium upsell, ad iframes).
+1. Redirect of the feed surfaces (`/`, `/feed`, `/feed/foryou`) to
+   `/feed/network/` (DNR for cold navigations + SPA watcher for in-app routing).
+2. Feed and rail advertising/promos removed (Promoted cards, Premium upsell,
+   ad iframes).
+3. Messaging junk, `/mynetwork/grow` promos and Premium job-detail cards
+   removed; "People you may know" kept.
+4. Advanced job filters (date, experience, employment type, remote, Easy
+   Apply, title/company blocklist) on `/jobs/*`.
+5. Home reflow: once the right rail is empty, the feed reclaims its columns.
 
-Everything else — feed rewriting, junk cards, whitelists, cascade guards — was
-implemented, tested live, and then **deliberately removed from the codebase and
-from git history**.
+Everything else — feed rewriting, junk-card cascade, whitelists of followed
+handles — was implemented, tested live, and then **deliberately removed from
+the codebase and from git history**.
 
 ## Design history: why it collapsed to a redirect
 
@@ -50,6 +56,13 @@ handles, cascade guards…) was defeated by three converging forces:
   `history.pushState` to `/feed/foryou/` without a network request (verified
   live). `pushState`/`replaceState`/`popstate` are wrapped and re-run `route()`.
   Without it, the redirect only worked on full reloads.
+
+**Decision — redirect, not blank feed.** The original spec (RF5) called for
+hiding the home feed entirely, News-Feed-Eradicator style. In practice a blank
+page left no useful landing surface and broke expectations on refresh, so the
+final behavior redirects the algorithmic surfaces to `/feed/network/` instead.
+The network feed remains readable; individual posts (`/feed/update/…`) are
+never touched.
 
 ### Advertising
 - **Feed ads**: the ad post carries the exact label `Promoted` (or
@@ -113,23 +126,25 @@ ancestor of the "Dismiss \<title\> job" button) and hides it with
 `display:none` + `data-bs-reason="jobs-block"`. It is reversible: clearing the
 list restores the cards. Values persist under the `jobs` storage key.
 
-### Home: responsive feed width
-The feed grid is 24 columns: profile rail (1–6), feed (7–16), right rail
-(17–24). Once the right rail is emptied (puzzles are hidden), the feed stays
-stuck at ~386 px and the rail keeps 304 px of blank space. `reflowFeed()`
-measures the aside's visible content on the feed page and, when empty, adds
-`.bs-wide-feed` to the grid; CSS then makes the feed span `7 / -1`, so the
-cards grow with the viewport (386 → 714 px at 1089 px wide, 840 px at 1600 px)
-and the empty rail disappears. The class is removed as soon as the aside has
-visible content again or the viewport drops below 1024 px (mobile layout).
+### Home: puzzles and responsive feed width
+The "Today's puzzles" card (`#feedRightNavGamesComponentRef`) is removed by
+hiding the whole rail child that contains the component (not just the inner
+node), so no empty card remains. The feed grid is 24 columns: profile rail
+(1–6), feed (7–16), right rail (17–24). Once the right rail is emptied, the
+feed stays stuck at ~386 px and the rail keeps 304 px of blank space.
+`reflowFeed()` measures the aside's visible content on the feed page and, when
+empty, adds `.bs-wide-feed` to the grid; CSS then makes the feed span `7 / -1`,
+so the cards grow with the viewport (386 → 714 px at 1089 px wide, 840 px at
+1600 px) and the empty rail disappears. The class is removed as soon as the
+aside has visible content again or the viewport drops below 1024 px (mobile
+layout).
 - Network-level LinkedIn ad hosts (`ads.linkedin.com`, `adg.linkedin.com`,
   `px.ads.linkedin.com`, …) are already blocked by the shared DNR ruleset.
 
 ### Intentional non-goals
-- Hiding the home feed row by row (unreachable by redirect).
-- "Today's puzzles" (`#feedRightNavGamesComponentRef`), "Add to your feed",
-  Analytics/"People who viewed your profile", the LinkedIn Corporation footer:
-  not advertising per the product decision — left visible.
+- Hiding the home feed row by row (the surface is unreachable by redirect).
+- "Add to your feed" suggestions and the LinkedIn Corporation footer: not
+  advertising by the product definition — left visible.
 - Mini-profile rail protection beyond the bounded upsell climb.
 
 ## Practical context / gotchas

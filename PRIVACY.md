@@ -37,8 +37,10 @@ BarelySocial does not transmit any information. It only:
 - Uses the browser's Declarative Net Request API to block ad and tracking
   requests on those sites.
 
-No browsing history, page content, credentials or personal data is read,
-stored or transmitted by the extension.
+No page content, credentials or personal data is stored or transmitted by the
+extension. To decide what to hide, the content scripts read the page's DOM
+locally; that content never leaves the browser and is not persisted by
+BarelySocial.
 
 ## Permissions
 

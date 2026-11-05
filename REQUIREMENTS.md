@@ -14,6 +14,30 @@ Cada plataforma es independiente: si un site se rompe (cambio de HTML), las otra
 
 ---
 
+## Estado de implementación (1.0)
+
+Los RF de abajo se conservan como especificación original; esta tabla registra
+dónde quedó cada uno tras la verificación en vivo.
+
+| RF | Estado | Decisión final / delta |
+|---|---|---|
+| RF1 | Hecho | Inyección por sitio desde `lib/sites.js`; CSS + JS separados por dueño. |
+| RF2 | Hecho | Feed en Siguiendo, suggested ban, whitelist escaneada, banners de fin de feed, allowance diario, redirects a overlay de bloqueo. |
+| RF3 | Hecho | Landing DNR a `/feed/subscriptions`, Shorts fuera, sidebar podada por texto, ads del player vaciados en `ads.js` (MAIN world) + DNR. Comentarios visibles. |
+| RF4 | Hecho | Discovery redirigido; con sesión, el home fuerza **Following** (`#feed-tab-2`) y oculta **For You** (`#feed-tab-1`); ads/promos fuera; rail del home colapsado. |
+| RF5 | **Cambiado** | No se deja el feed en blanco ni se oculta la home entera: home y `/feed/foryou` redirigen a `/feed/network/` (DNR + watcher de SPA). El feed de red sigue disponible. Se añaden limpieza de ads/promos/mensajes/jobs y filtros avanzados de empleo. |
+| RF6 | Hecho | `/messages` solo si el toggle "Solo DMs" está activo; por defecto, `/` fuerza la pestaña **Siguiendo** y nunca resuelve For You. |
+| RF7 | **No implementado** | Guardrail de sesión diferido (YAGNI en 1.0). El overlay de superficie bloqueada de Instagram cubre el caso de entrada a Reels/Explore. |
+| RF8 | **Parcial** | El popup existe y persiste `sites[s].on`, pero los content scripts y las reglas DNR todavía no consultan ese flag: apagar un sitio en el popup no detiene la limpieza. Es el gap conocido antes de publicar. |
+| RF9 | Hecho | Tres capas: CSS, DNR por `initiatorDomains` y reescritura de respuestas `/youtubei/v1/*` para ads in-player. Fallback fail-open. |
+| RF10 | **Parcial** | Overlay de bloqueo en Instagram y allowance diario implementado (solo Instagram lo consume). El delay de 2–3 s no se implementó. |
+
+**RNF:** cero backend, CSS-first, fragilidad contenida por sitio y fail-open se
+cumplen. El tamaño empaquetado (~52 KB por zip) queda cerca del objetivo de
+RNF5 pero lo supera ligeramente.
+
+---
+
 ## Requisitos funcionales
 
 ### RF1 — Inyección de reglas por sitio

@@ -1,8 +1,20 @@
 # BarelySocial 1.0 — Release / Publishing Guide
 
 Estado: **1.0 (build 1)**. Extensión empaquetada y Xcode Release compilando
-(macOS e iOS). Lo único que falta para subir es la **firma con tu Team** y el
-registro de la app en App Store Connect (requiere tu cuenta).
+(macOS e iOS). Para subir falta la **firma con tu Team** y el registro de la
+app en App Store Connect (requiere tu cuenta); la ficha todavía necesita la
+privacy URL pública y las capturas.
+
+Verificado el 2026-11-05:
+
+- `xcodebuild` Release **macOS** e **iOS Simulator** → `BUILD SUCCEEDED` sin
+  firma. El `.appex` empaquetado incluye `lib/`, `sites/`, `rules/`, `ads.js`,
+  `popup/` e `icons/`.
+- `AppIcon.icns` (macOS) y `Assets.car` (iOS) se generan; el set de iconos ya
+  no está vacío.
+- Reddit con sesión real: el home abre en **Following**, For You no es visible
+  y el rail colapsado deja el feed en **1057 px** (viewport 1089).
+- Zips regenerados desde `tools/package.sh`; `node tools/check-modules.mjs` OK.
 
 ## Artefactos
 
@@ -90,7 +102,36 @@ cualquier hosting (GitHub Pages sirve) y pega la URL.
 - El icono se genera con `tools/draw-icon.py` (fuente 1024×1024) y
   `tools/make-icons.py` (iOS sin alfa, macOS squircle, extensión 16–128).
   Cambia colores o la marca en `draw-icon.py` y vuelve a ejecutar ambos.
+- **Marca**: un post — avatar coral `#FF5B3D` + tres líneas sobre charcoal
+  `#15171C`; solo la primera línea es blanca y las otras se funden en el fondo.
+  Se dibuja a 4096 px y se reduce, así que no depende de assets externos.
+- **Restricciones del formato**: el icono iOS 1024 se aplana sobre el fondo
+  (App Store rechaza alfa); macOS usa squircle con margen y esquinas
+  transparentes; la extensión usa las mismas formas en 16/32/48/128. El
+  `AppIcon.appiconset/Contents.json` lo reescribe `make-icons.py`.
 - Safari usa `background.scripts` (event page); el zip de Chrome ya se genera
   con `background.service_worker`.
 - No hay build number compartido entre mac e iOS: App Store Connect exige uno
   distinto por subida en la misma versión.
+
+## Pendiente antes de enviar (checklist)
+
+- [ ] Team de firma en los 4 targets y Archive firmado (macOS + iOS).
+- [ ] App Store Connect: app creada, privacy = **Data Not Collected**, build
+      subido, testers internos de TestFlight.
+- [ ] `PRIVACY.md` publicado en una URL pública y pegada en la ficha.
+- [ ] Sustituir `<YOUR-EMAIL>` / `<YOUR-SUPPORT-URL>` / `<YOUR-PRIVACY-URL>`.
+- [ ] Screenshots de tienda (1280×800 mínimo para Chrome; sizes de App Store).
+- [ ] Gap conocido: el toggle maestro del popup **no** detiene todavía content
+      scripts ni reglas DNR (ver RF8 en `REQUIREMENTS.md`). No anunciarlo como
+      pausa global hasta arreglarlo.
+- [ ] Opcional: subir el zip de Chrome y verificar el service worker.
+
+## Verificación en vivo
+
+La extensión se carga **desempaquetada** desde `extension/`; cada cambio exige
+**Reload** manual en `chrome://extensions` (no se puede automatizar por CDP) y
+recargar la pestaña. Para confirmar inyección, mira
+`document.documentElement.dataset.bsSite` (`instagram`, `youtube`, `reddit`,
+`linkedin` o `tiktok`); `window.__BS_SITE` vive en el world aislado y no es
+visible desde la página.
