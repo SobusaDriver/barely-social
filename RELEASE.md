@@ -87,10 +87,9 @@ cualquier hosting (GitHub Pages sirve) y pega la URL.
 
 ## Notas
 
-- El icono de app es el placeholder del converter (rayo). Si quieres uno
-  propio, sustitúyelo en
-  `BarelySocial/Shared (App)/Assets.xcassets/AppIcon.appiconset/` (1024×1024
-  sin alfa) y en `extension/icons/`.
+- El icono se genera con `tools/draw-icon.py` (fuente 1024×1024) y
+  `tools/make-icons.py` (iOS sin alfa, macOS squircle, extensión 16–128).
+  Cambia colores o la marca en `draw-icon.py` y vuelve a ejecutar ambos.
 - Safari usa `background.scripts` (event page); el zip de Chrome ya se genera
   con `background.service_worker`.
 - No hay build number compartido entre mac e iOS: App Store Connect exige uno
