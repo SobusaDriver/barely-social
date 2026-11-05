@@ -1,0 +1,6 @@
+2026/11/04-23:25:00.304 3a282c Reusing MANIFEST /Users/sobusadriver/Library/Application Support/Google/Chrome/Default/Local Storage/leveldb/MANIFEST-000001
+2026/11/04-23:25:00.305 3a282c Recovering log #4
+2026/11/04-23:25:00.305 3a282c Reusing old log /Users/sobusadriver/Library/Application Support/Google/Chrome/Default/Local Storage/leveldb/000004.log 
+2026/11/04-23:25:40.195 3a2831 Level-0 table #8: started
+2026/11/04-23:25:40.201 3a2831 Level-0 table #8: 40114 bytes OK
+2026/11/04-23:25:40.203 3a2831 Delete type=0 #4

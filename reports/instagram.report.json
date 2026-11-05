@@ -1,0 +1,38 @@
+{
+  "site": "instagram",
+  "lastVerified": "2026-11-04",
+  "home": {
+    "href": "https://www.instagram.com/",
+    "title": "(1) Instagram",
+    "reelsShortsLinks": 0,
+    "sponsoredLabels": 0,
+    "suggestedInDOM": 0,
+    "contentItems": 3,
+    "overlayText": null
+  },
+  "probeBlockedSurface": {
+    "href": "https://www.instagram.com/reels/DfVGqalBtz0/",
+    "overlay": "Bloqueado por BarelySocialVuelve a tu feed de seguidosVolver"
+  },
+  "failedRequestsSample": [],
+  "consoleIssues": [
+    "warning: Error with Permissions-Policy header: Unrecognized feature: 'attribution-reporting'.",
+    "warning: Error with Permissions-Policy header: Unrecognized feature: 'shared-storage'.",
+    "warning: Error with Permissions-Policy header: Unrecognized feature: 'shared-storage-select-url'.",
+    "warning: Error with Permissions-Policy header: Unrecognized feature: 'attribution-reporting'.",
+    "warning: Error with Permissions-Policy header: Unrecognized feature: 'shared-storage'.",
+    "warning: Error with Permissions-Policy header: Unrecognized feature: 'shared-storage-select-url'.",
+    "error: Permissions policy violation: unload is not allowed in this document.",
+    "warning: Error with Permissions-Policy header: Unrecognized feature: 'attribution-reporting'.",
+    "warning: Error with Permissions-Policy header: Unrecognized feature: 'shared-storage'.",
+    "warning: Error with Permissions-Policy header: Unrecognized feature: 'shared-storage-select-url'.",
+    "warning: Error with Permissions-Policy header: Unrecognized feature: 'attribution-reporting'.",
+    "warning: Error with Permissions-Policy header: Unrecognized feature: 'shared-storage'.",
+    "warning: Error with Permissions-Policy header: Unrecognized feature: 'shared-storage-select-url'.",
+    "error: Permissions policy violation: unload is not allowed in this document."
+  ],
+  "screenshots": [
+    "/Users/sobusadriver/Projects/barely-social/reports/instagram-home.png",
+    "/Users/sobusadriver/Projects/barely-social/reports/instagram-blocked.png"
+  ]
+}

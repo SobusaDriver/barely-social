@@ -3,10 +3,16 @@
 /* ===== Shorts ===== */
 
 /* Sidebar "Shorts" item and guide entry */
-ytd-guide-entry-renderer a[href*="/shorts"],
-ytd-mini-guide-entry-renderer a[href*="/shorts"],
-#endpoint[ytab*="shorts"],
-ytd-guide-entry-renderer:has(a[href="/shorts"]) {
+ytd-guide-entry-renderer[title*="Shorts" i],
+ytd-mini-guide-entry-renderer[title*="Shorts" i],
+ytd-guide-entry-renderer:has(a[href="/shorts"]),
+ytd-guide-entry-renderer:has(a#endpoint[title="Shorts"]) {
+  display: none !important;
+}
+
+/* Sección "Explorar" completa (Música, En vivo, Videojuegos, …) */
+ytd-guide-section-renderer:has(ytd-guide-entry-renderer[title="Música"]),
+ytd-guide-section-renderer:has(ytd-guide-entry-renderer[title="Trending"]) {
   display: none !important;
 }
 

@@ -1,0 +1,31 @@
+{
+  "site": "youtube",
+  "lastVerified": "2026-11-04",
+  "home": {
+    "href": "https://www.youtube.com/",
+    "title": "YouTube",
+    "reelsShortsLinks": 0,
+    "sponsoredLabels": 0,
+    "suggestedInDOM": 0,
+    "contentItems": 0,
+    "overlayText": "You're signed outVideos you watch may be added to the TV's watch history and influence TV recommendations. To avoid this, cancel and sign in to YouTube on your "
+  },
+  "probeBlockedSurface": {
+    "href": "https://www.youtube.com/",
+    "overlay": "You're signed outVideos you watch may be added to the TV's watch history and influence TV recommendations. To avoid this, cancel and sign in to YouTube on your "
+  },
+  "failedRequestsSample": [
+    "https://www.youtube.com/"
+  ],
+  "consoleIssues": [
+    "error: Failed to load resource: the server responded with a status of 401 ()",
+    "warning: Manifest: property 'migrate_from' ignored, manifest must specify an 'id' property in order to receive a migration.",
+    "warning: The resource https://i.ytimg.com/generate_204 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "warning: Manifest: property 'migrate_from' ignored, manifest must specify an 'id' property in order to receive a migration.",
+    "warning: The resource https://i.ytimg.com/generate_204 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+  ],
+  "screenshots": [
+    "/Users/sobusadriver/Projects/barely-social/reports/youtube-home.png",
+    "/Users/sobusadriver/Projects/barely-social/reports/youtube-blocked.png"
+  ]
+}

@@ -148,6 +148,36 @@
   }
 
   // ---- Instagram ----
+  function neutralizeAccent() {
+    // todo lo "rojo/rosa de Meta" → gris. Heurística de color en estilos
+    // computados: fondos, box-shadows (badge) y SVG con gradiente/acento.
+    const ACCENT_RE = /rgba?\(\s*(255|247|246)\s*,\s*(48|59)\s*/;
+    const isAccent = (str) => ACCENT_RE.test(str);
+    const targets = new Set();
+    for (const el of document.querySelectorAll("svg, span, div")) {
+      const cs = getComputedStyle(el);
+      let hit = false;
+      if (el.tagName === "SVG") {
+        hit = el.querySelector("linearGradient, radialGradient") != null;
+        if (!hit) hit = [...el.querySelectorAll("*")].some((c) => {
+          const f = getComputedStyle(c).fill || "";
+          return isAccent(f) || f.includes("url(#");
+        });
+      } else {
+        hit =
+          isAccent(cs.backgroundColor) ||
+          isAccent(cs.boxShadow) ||
+          /linear|radial/.test(cs.backgroundImage);
+      }
+      if (hit && el.offsetParent) targets.add(el);
+    }
+    for (const el of targets) {
+      if (el.dataset.bsGray) continue;
+      el.dataset.bsGray = "1";
+      el.style.setProperty("filter", "grayscale(1) brightness(0.85)", "important");
+    }
+  }
+
   function instagram() {
     const cfg = state.sites.instagram || {};
     // onlyDMs → direct inbox (F4)
@@ -162,13 +192,52 @@
       armReblock();
       return;
     }
+    // acento neutro: anillos de historias, badges de notificación, iconos con
+    // gradiente rosa/rojo de IG → escala de grises (CSS no puede matchear color)
+    retry(() => { neutralizeAccent(); return true; });
+    let accentTimer = null;
+    const accentObs = new MutationObserver(() => {
+      // spaghettificación fina: IG manda mutaciones a cada rato; debouce 400 ms
+      if (accentTimer) return;
+      accentTimer = setTimeout(() => {
+        accentTimer = null;
+        try { neutralizeAccent(); } catch {}
+      }, 400);
+    });
+    accentObs.observe(document.body, { childList: true, subtree: true });
     // home → asegurar pestaña "Siguiendo"
     if (location.pathname === "/" || location.pathname === "") {
       retry(() => {
         const tab = Array.from(
           document.querySelectorAll('a[role="link"], [role="tab"], button')
-        ).find((el) => /^siguiendo$/i.test((el.textContent || "").trim()));
+        ).find((el) => /^siguiendo$|^following$/i.test((el.textContent || "").trim()));
         if (tab) { tab.click(); return true; }
+        return false;
+      });
+      // "Sugerencias para ti" (dcha): anchor = link "Ver todo"
+      // (a[href="/explore/people/"]). Escalar hasta el hijo directo de la
+      // fila de dos columnas y ocultar SOLO el de la derecha (left > 55%
+      // viewport) que no contenga el feed.
+      retry(() => {
+        const link = document.querySelector('a[href="/explore/people/"]');
+        if (!link) return false;
+        const main = document.querySelector('main[role="main"]');
+        if (!main) return false;
+        let panel = null;
+        for (const cand of main.querySelectorAll("div")) {
+          if (!cand.contains(link)) continue;
+          const r = cand.getBoundingClientRect();
+          if (r.left > window.innerWidth * 0.55 && !cand.querySelector("article, section[role='feed']")) {
+            // el primer match en orden de documento es el ancestro externo: el
+            // panel entero. Los siguientes son sus descendientes.
+            panel = cand;
+            break;
+          }
+        }
+        if (panel) {
+          panel.style.display = "none";
+          return true;
+        }
         return false;
       });
     }
@@ -176,8 +245,39 @@
 
   // ---- YouTube ----
   function youtube() {
+    // Sidebar: fuera Explorar (todo el section), Más de YouTube (section),
+    // Principal (entry) e Historial de denuncias (entry). Los entries son
+    // a#endpoint sin href estable → matchear por TEXTO del entry/section.
+    // Regla del usuario: la guía queda con SOLO "Suscripciones"; todo el resto
+    // (Principal, Shorts, Tú, Historial, Explorar, Más de YouTube…) fuera.
+    const pruneGuide = () => {
+      let changed = false;
+      for (const ent of document.querySelectorAll("ytd-guide-entry-renderer")) {
+        const t = (ent.textContent || "").trim();
+        if (!/suscripciones|subscriptions/i.test(t)) {
+          ent.remove(); changed = true;
+        }
+      }
+      for (const sec of document.querySelectorAll("ytd-guide-section-renderer")) {
+        if (!sec.querySelector("ytd-guide-entry-renderer")) {
+          sec.remove(); changed = true;
+        }
+      }
+      return changed;
+    };
+    retry(pruneGuide);
+    // el guía se (re)renderiza al expandir el hamburger → observador persistente
+    let ytTimer = null;
+    new MutationObserver(() => {
+      if (ytTimer) return;
+      ytTimer = setTimeout(() => { ytTimer = null; try { pruneGuide(); } catch {} }, 600);
+    }).observe(document.body, { childList: true, subtree: true });
     // Shorts → feed de suscripciones; el "solo seguidos" del home lo hace CSS
     if (/^\/shorts\//.test(location.pathname)) {
+      location.replace("/feed/subscriptions");
+    }
+    // regla del usuario: el home SIEMPRE es suscripciones, nunca "Principal"
+    if (location.pathname === "/" || location.pathname === "") {
       location.replace("/feed/subscriptions");
     }
   }

@@ -26,6 +26,13 @@
     },
     {
       "matches": ["https://*.youtube.com/*"],
+      "js": ["ads.js"],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://*.youtube.com/*"],
       "js": ["content.js"],
       "css": ["rules/youtube.css"],
       "run_at": "document_start",

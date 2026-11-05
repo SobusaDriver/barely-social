@@ -1,0 +1,6 @@
+2026/11/03-20:06:59.573 33a47e Reusing MANIFEST /Users/sobusadriver/Library/Application Support/Google/Chrome/Default/IndexedDB/https_bancoserfinanza.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/11/03-20:06:59.574 33a47e Recovering log #11
+2026/11/03-20:06:59.577 33a47e Reusing old log /Users/sobusadriver/Library/Application Support/Google/Chrome/Default/IndexedDB/https_bancoserfinanza.com_0.indexeddb.leveldb/000011.log 
+2026/11/03-20:07:05.666 33a483 Level-0 table #16: started
+2026/11/03-20:07:05.678 33a483 Level-0 table #16: 1125254 bytes OK
+2026/11/03-20:07:05.679 33a483 Delete type=0 #11
