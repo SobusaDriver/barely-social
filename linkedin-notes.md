@@ -82,12 +82,20 @@ Its filter set mirrors the most-used open-source job-search projects
 
 | Control | How it is applied |
 |---|---|
-| Fecha (24 h / semana / mes) | LinkedIn's native "Date posted" dropdown |
+| Fecha (última hora / 24 h / semana / mes) | LinkedIn's native "Date posted" dropdown; "última hora" adds a local age cut |
 | Experiencia (inicial → ejecutivo) | LinkedIn's native "Experience level" dropdown |
 | Tipo de empleo | LinkedIn's native "Employment type" dropdown |
 | Remoto | LinkedIn's native "Filter by Remote" checkbox |
 | Easy Apply | LinkedIn's native "Filter by Easy Apply" checkbox |
 | Excluir títulos / empresas | Client-side blocklist over rendered cards |
+
+**Last hour**: LinkedIn has no "past hour" option and `f_TPR=r3600` is degraded
+to 24 hours by the current search page (verified live: it returns jobs 6–15 h
+old under a "Past 24 hours" label). So "última hora" = native 24 h filter plus
+a local cut: each rendered card's "Posted N hours/minutes ago" text is parsed
+(`ageMinutes`) and cards older than 60 minutes are hidden. Cards without a
+parseable age (e.g. saved jobs showing "Saved · Be an early applicant") fail
+open and stay visible.
 
 Why not URL parameters: the current `/jobs/search-results/` page honors
 `f_TPR` and `f_AL` but **ignores `f_WT`, `f_E` and `f_JT`** (verified live

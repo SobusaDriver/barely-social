@@ -74,7 +74,7 @@
     // Jobs: panel de filtros avanzados + blocklists (solo en /jobs/*)
     if (onJobs()) {
       injectJobs();
-      applyBlocklist();
+      applyCardFilters();
     } else {
       injectJobs(); // limpia la UI al salir de /jobs
     }
@@ -90,6 +90,7 @@
   const onJobs = () => location.pathname.startsWith("/jobs");
 
   const DATE_OPTS = {
+    "1h": ["Past 24 hours", "Últimas 24 horas"], // LinkedIn no tiene "última hora": 24 h + filtro local
     "24h": ["Past 24 hours", "Últimas 24 horas"],
     week: ["Past week", "Última semana"],
     month: ["Past month", "Último mes"],
@@ -197,25 +198,57 @@
     return true;
   };
 
-  // Blocklist (estilo JobFunnel): oculta tarjetas ya renderizadas. El card es
-  // el [role="button"] que contiene el botón "Dismiss <puesto> job".
+  // Blocklist (estilo JobFunnel) + "última hora" (filtro local): oculta
+  // tarjetas ya renderizadas. El card es el [role="button"] que contiene el
+  // botón "Dismiss <puesto> job".
   const termsOf = (v) => String(v || "").toLowerCase().split(",").map((s) => s.trim()).filter(Boolean);
-  const applyBlocklist = () => {
+
+  // antigüedad de la oferta en minutos; null = sin dato → fail-open
+  const ageMinutes = (text) => {
+    const t = text.toLowerCase();
+    if (/just now|ahora mismo|hace un momento/.test(t)) return 0;
+    let m = /hace\s+(\d+)\s*(?:min|minuto)/.exec(t) ||
+            /(\d+)\s*(?:min|minute|minuto)s?\s*(?:ago|atrás)/.exec(t);
+    if (m) return Number(m[1]);
+    m = /hace\s+(\d+)\s*(?:hora|h\b)/.exec(t) ||
+        /(\d+)\s*(?:hour|hrs?|h|hora)s?\s*(?:ago|atrás)/.exec(t);
+    if (m) return Number(m[1]) * 60;
+    m = /hace\s+(\d+)\s*(?:día|semana|mes|año)/.exec(t) ||
+        /(\d+)\s*(?:day|días?|week|semanas?|month|mes(?:es)?|year|años?)\s*(?:ago|atrás)/.exec(t);
+    if (m) return Number(m[1]) * 1440; // basta para descartar (>1 h)
+    return null;
+  };
+
+  const setCard = (card, reason) => {
+    card.style.setProperty("display", "none", "important");
+    card.dataset.bsHidden = "1";
+    card.dataset.bsReason = reason;
+  };
+  const clearCard = (card) => {
+    card.style.removeProperty("display");
+    delete card.dataset.bsHidden;
+    delete card.dataset.bsReason;
+  };
+
+  const applyCardFilters = () => {
     const j = jobsState();
     const blocked = [...termsOf(j.excludeTitles), ...termsOf(j.excludeCompanies)];
+    const lastHour = j.date === "1h";
     for (const dismiss of document.querySelectorAll('main button[aria-label^="Dismiss "]')) {
       const card = dismiss.closest('[role="button"]');
       if (!card) continue;
-      if (!blocked.length) {
-        if (card.dataset.bsReason === "jobs-block") {
-          card.style.removeProperty("display");
-          delete card.dataset.bsHidden;
-          delete card.dataset.bsReason;
-        }
-        continue;
-      }
       const t = (card.textContent || "").toLowerCase();
-      if (blocked.some((b) => t.includes(b))) hide(card, "jobs-block");
+      let reason = null;
+      if (blocked.some((b) => t.includes(b))) reason = "jobs-block";
+      else if (lastHour) {
+        const age = ageMinutes(t);
+        if (age !== null && age > 60) reason = "jobs-hour";
+      }
+      if (reason) {
+        if (card.dataset.bsReason !== reason) setCard(card, reason);
+      } else if (/^jobs-/.test(card.dataset.bsReason || "")) {
+        clearCard(card);
+      }
     }
   };
 
@@ -256,7 +289,7 @@
     panel.innerHTML = `
       <div class="bsj-title">Filtros avanzados</div>
       <div class="bsj-row"><label for="bsj-date">Fecha</label>
-        <select id="bsj-date"><option value="">Cualquiera</option><option value="24h">Últimas 24 h</option><option value="week">Última semana</option><option value="month">Último mes</option></select></div>
+        <select id="bsj-date"><option value="">Cualquiera</option><option value="1h">Última hora</option><option value="24h">Últimas 24 h</option><option value="week">Última semana</option><option value="month">Último mes</option></select></div>
       <div class="bsj-row"><label for="bsj-experience">Experiencia</label>
         <select id="bsj-experience"><option value="">Cualquiera</option><option value="entry">Inicial</option><option value="senior">Senior</option><option value="manager">Manager</option><option value="director">Director</option><option value="executive">Ejecutivo</option></select></div>
       <div class="bsj-row"><label for="bsj-employment">Tipo de empleo</label>
@@ -284,8 +317,9 @@
       BS.state.jobs = j;
       BS.setStore({ jobs: j });
       status("Aplicando…");
-      applyBlocklist();
+      applyCardFilters();
       const ok = await applyNative();
+      applyCardFilters(); // tarjetas nuevas tras aplicar los filtros nativos
       status(ok ? "Listo" : "No encontré la barra de filtros de LinkedIn");
     });
 
@@ -294,7 +328,7 @@
       BS.state.jobs = j;
       BS.setStore({ jobs: j });
       syncPanel();
-      applyBlocklist();
+      applyCardFilters();
       const reset = [...document.querySelectorAll('#JobsSearchFilters a, #JobsSearchFilters [role="button"]')]
         .find((e) => /^(reset|restablecer)$/i.test(norm(e)));
       if (reset) reset.click();
