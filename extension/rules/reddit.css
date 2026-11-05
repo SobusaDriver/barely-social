@@ -135,6 +135,13 @@ div[data-adserver-temporary-id] {
   display: none !important;
 }
 
+/* ================= Home: For You (feed algorítmico) ================= */
+/* El home logueado trae tabs For You / Following; For You es el feed de
+   descubrimiento. Se oculta la pestaña y sites/reddit.js fuerza Following. */
+#feed-tab-1 {
+  display: none !important;
+}
+
 /* ================= Right rail: discovery & promos ================= */
 /* "Discover communities", "People also ask", "Related posts" (listado infinito
    de otros posts) y Promotion son descubrimiento/ads. Al quedar vacío, el

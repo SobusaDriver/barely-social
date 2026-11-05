@@ -22,6 +22,16 @@
     }
   };
 
+  // Home logueado: Reddit abre en "For You" (feed algorítmico). Forzamos la
+  // pestaña "Following" (solo comunidades unidas) y no dejamos entrada atrás.
+  // ids estables: feed-tab-1 = For You, feed-tab-2 = Following.
+  const forceFollowing = () => {
+    if (location.pathname !== "/") return;
+    const following = document.getElementById("feed-tab-2");
+    if (!following) return;
+    if (!following.classList.contains("tab-selected")) following.click();
+  };
+
   // El home es un grid `main-container` de 2 columnas (feed | right-sidebar).
   // En el home el rail es 100% descubrimiento/promos (Discover communities,
   // "recently viewed", ads), así que se colapsa siempre y el feed usa todo el
@@ -42,14 +52,15 @@
       if (DISCOVERY.test(location.pathname)) location.replace("/");
     };
     route();
-    BS.retry(() => { reflow(); return true; });
+    BS.retry(() => { forceFollowing(); reflow(); return true; });
+    forceFollowing();
 
     let timer = null;
     new MutationObserver(() => {
       if (timer) return;
       timer = setTimeout(() => {
         timer = null;
-        try { route(); hideRailNav(); reflow(); } catch {}
+        try { route(); forceFollowing(); hideRailNav(); reflow(); } catch {}
       }, 300);
     }).observe(document.documentElement, { childList: true, subtree: true });
     addEventListener("resize", () => { try { hideRailNav(); reflow(); } catch {} });

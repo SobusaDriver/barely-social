@@ -30,6 +30,12 @@ better than class-based DOM, so almost all behavior lives in CSS.
   there is no visual entry point left either.
 
 ### Feed = joined communities only
+- The logged-in home ships two tabs: **"For You"** (`#feed-tab-1`, algorithmic)
+  and **"Following"** (`#feed-tab-2`, joined communities). For You is the
+  default. The content script clicks Following as soon as the tab renders and
+  re-checks on every mutation; the For You tab is hidden with CSS, so there is
+  no entry point back to the algorithmic feed. Individual subreddits, post
+  pages and search remain reachable.
 - Posts with recommendation markers are hidden: `[recommended]`,
   `[data-source="frontpage-featured"]`, `:has()` heuristics on
   "recommended from r/…" banners, and any "Explore/Latest" feed sections.
