@@ -179,5 +179,21 @@
         "main_frame"
       ]
     }
+  },
+  {
+    "id": 901,
+    "priority": 10,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "url": "https://www.linkedin.com/feed/network/"
+      }
+    },
+    "condition": {
+      "regexFilter": "^https?://(?:www\\.)?linkedin\\.com/(?:\\?.*)?$",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
   }
 ]

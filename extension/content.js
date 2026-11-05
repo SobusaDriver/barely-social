@@ -303,9 +303,10 @@
           hide(art); art.dataset.bsReason = "not-followed";
         }
       }
-      // feed-end: cuando el scrub tapa el ÚLTIMO post no seguido, IG intenta
-      // rellenar en su lugar: showFeedEnd lo marca; se llama en el observer
-      // feed VACÍO real: cero articles visibles tras el scrub → aviso claro
+      // feed-end / feed-vacío SOLO en la página de feed ("/"). Los perfiles,
+      // /explore, /direct y grids no usan article → sin gating, se fals-
+      // positivaría "feed vacío" en cada perfil (caso del usuario).
+      if (location.pathname !== "/" && location.pathname !== "") return;
       const visibleArticles = [...document.querySelectorAll("main article")]
         .filter((a) => !a.dataset.bsHidden && a.getBoundingClientRect().height > 0).length;
       if (!feedEnded) {
@@ -411,7 +412,11 @@
           }
         }
       };
-      addEventListener("scroll", () => { try { scr(); } catch {} }, { passive: true });
+      addEventListener("scroll", () => {
+        // el trigger de fin-de-feed SOLO vale en la página de feed "/"
+        if (location.pathname !== "/" && location.pathname !== "") return;
+        try { scr(); } catch {}
+      }, { passive: true });
     };
     const pruneSuggested = () => {
       let changed = false;
@@ -578,27 +583,16 @@
   }
 
   // ---- LinkedIn ----
+  // KISS/YAGNI: único cambio conservado = landing My Network.
+  // Todo lo demás (hides de feed, junk, whitelist) fue retirado.
   function linkedin() {
-    const cfg = state.sites.linkedin || {};
-    if (location.pathname.startsWith("/feed/")) {
-      if (cfg.onlyDMs) { location.replace("/"); return; } // F4: a inicio (CSS lo deja en blanco)
-      const col =
-        document.querySelector("main .scaffold-finite-scroll__content") ||
-        document.querySelector("main");
-      if (!col || document.getElementById("bs-linkin-overlay")) return;
-      const ov = document.createElement("div");
-      ov.id = "bs-linkin-overlay";
-      ov.setAttribute("role", "dialog");
-      ov.setAttribute("aria-label", "Feed apagado por BarelySocial");
-      Object.assign(ov.style, {
-        padding: "3rem 1.5rem", borderRadius: "12px",
-        background: "#16181d", color: "#f2f2f2",
-        fontFamily: "-apple-system,system-ui,sans-serif",
-        fontSize: "1.1rem", textAlign: "center", margin: "2rem auto",
-        maxWidth: "32rem",
-      });
-      ov.textContent = "Feed apagado por BarelySocial";
-      col.prepend(ov);
+    // "/feed/network/" TAMBIÉN empieza por "/feed" — excluir el target del
+    // redirect o el handler se auto-dispara (lección del loop infinito).
+    const IS_TARGET = /^\/feed\/network\/?$/.test(location.pathname);
+    const NEEDS = location.pathname === "" || location.pathname === "/" ||
+      (location.pathname.startsWith("/feed") && !IS_TARGET);
+    if (NEEDS) {
+      location.replace("https://www.linkedin.com/feed/network/");
     }
   }
 
