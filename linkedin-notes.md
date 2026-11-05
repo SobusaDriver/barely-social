@@ -74,6 +74,31 @@ handles, cascade guards…) was defeated by three converging forces:
   "Unlock all with Premium") are hidden at the `main section` level. The
   "People you may know" cards and the "Suggestions for you" people list are
   **kept** — they are real people, not junk.
+
+### Jobs: advanced filters (`/jobs/*`)
+A "Filtros avanzados" pill is injected after LinkedIn's "All filters" button.
+Its filter set mirrors the most-used open-source job-search projects
+(`spinlud/linkedin-jobs-scraper`, `JobFunnel`):
+
+| Control | How it is applied |
+|---|---|
+| Fecha (24 h / semana / mes) | LinkedIn's native "Date posted" dropdown |
+| Experiencia (inicial → ejecutivo) | LinkedIn's native "Experience level" dropdown |
+| Tipo de empleo | LinkedIn's native "Employment type" dropdown |
+| Remoto | LinkedIn's native "Filter by Remote" checkbox |
+| Easy Apply | LinkedIn's native "Filter by Easy Apply" checkbox |
+| Excluir títulos / empresas | Client-side blocklist over rendered cards |
+
+Why not URL parameters: the current `/jobs/search-results/` page honors
+`f_TPR` and `f_AL` but **ignores `f_WT`, `f_E` and `f_JT`** (verified live
+2026-11-05), so those filters have to be driven through the page's own
+controls. Dropdowns are opened by clicking the filter pill, the option is
+clicked by its exact visible text (EN/ES aliases), then "Show results".
+
+Blocklist matching uses the card's `[role="button"]` container (the direct
+ancestor of the "Dismiss \<title\> job" button) and hides it with
+`display:none` + `data-bs-reason="jobs-block"`. It is reversible: clearing the
+list restores the cards. Values persist under the `jobs` storage key.
 - Network-level LinkedIn ad hosts (`ads.linkedin.com`, `adg.linkedin.com`,
   `px.ads.linkedin.com`, …) are already blocked by the shared DNR ruleset.
 

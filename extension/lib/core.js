@@ -14,7 +14,7 @@
   document.documentElement.dataset.bsSite = site.id;
 
   // claves reservadas por background.js: "sites", "allowance", "following"
-  const state = { sites: {}, allowance: {}, following: [] };
+  const state = { sites: {}, allowance: {}, following: [], jobs: {} };
 
   const RETRY_MS = 300;
   const RETRY_WINDOW_MS = 5000;
@@ -22,11 +22,12 @@
   function load() {
     if (!api || !api.storage || !api.storage.local) return Promise.resolve();
     return api.storage.local
-      .get(["sites", "allowance", "following"])
+      .get(["sites", "allowance", "following", "jobs"])
       .then((r) => {
         state.sites = r.sites || {};
         state.allowance = r.allowance || {};
         state.following = r.following || [];
+        state.jobs = r.jobs || {};
       })
       .catch(() => {});
   }
@@ -35,6 +36,7 @@
     if (!api || !api.storage || !api.storage.local) return Promise.resolve();
     return api.storage.local.set(obj).then(() => {
       if (obj.following) state.following = obj.following;
+      if (obj.jobs) state.jobs = obj.jobs;
     }).catch(() => {});
   }
 
