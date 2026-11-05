@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root { color-scheme: dark; }
+  body {
+    width: 280px;
+    margin: 0;
+    padding: 12px;
+    background: #121216;
+    color: #e8e8ec;
+    font: 13px -apple-system, "Helvetica Neue", sans-serif;
+  }
+  header { text-align: center; margin-bottom: 10px; }
+  h1 { font-size: 16px; margin: 0; letter-spacing: 0.3px; }
+  p.sub { margin: 2px 0 0; font-size: 11px; color: #8a8a92; }
+  .card {
+    background: #1c1c22;
+    border: 1px solid #2a2a32;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 8px;
+  }
+  .row1 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .name { font-weight: 600; text-transform: capitalize; }
+  .dms { font-size: 10px; color: #8a8a92; display: flex; align-items: center; gap: 4px; margin-top: 6px; }
+  .row2 { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 11px; color: #8a8a92; }
+  input[type="checkbox"] { accent-color: #7c6cf5; }
+  input[type="number"] {
+    width: 58px; background: #121216; color: #e8e8ec;
+    border: 1px solid #2a2a32; border-radius: 6px; padding: 3px 6px; font-size: 11px;
+  }
+  .used { margin-left: auto; font-size: 11px; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>BarelySocial</h1>
+    <p class="sub">solo sigues · mensajes · búsqueda</p>
+  </header>
+  <div id="cards"></div>
+  <script src="popup.js"></script>
+</body>
+</html>

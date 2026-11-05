@@ -1,0 +1,108 @@
+/* Last verified: 2026-11-04 — selectors may drift when Instagram changes HTML */
+/* SocialLite parity for instagram.com. Hide-only, fail-open. */
+
+/* ---------- Reels: nav items (sidebar + bottom bar) ---------- */
+a[href="/reels/"],
+a[href^="/reels/"],
+svg[aria-label="Reels"],
+[aria-label="Reels"] {
+  display: none !important;
+}
+
+/* Reels: trays/sections injected into the home feed */
+section:has(> div > a[href^="/reels/"]),
+[role="presentation"]:has(> a[href^="/reels/"]) {
+  display: none !important;
+}
+
+/* Reels: watch modal/overlay (hide without breaking layout beneath) */
+div[role="dialog"]:has(a[href^="/reels/"]),
+div[style*="overflow"]:has(> div > a[href^="/reels/"]) {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* ---------- Explore page & suggested search ---------- */
+a[href="/explore/"],
+[aria-label="Explorar"],
+[aria-label="Explore"],
+[aria-label="Buscar"],
+[aria-label="Search"],
+input[placeholder*="Buscar" i],
+input[placeholder*="Search" i] {
+  display: none !important;
+}
+
+/* ---------- Livestream indicators & live sections in feed ---------- */
+svg[aria-label*="En directo" i],
+svg[aria-label*="Live" i],
+[aria-label*="En directo" i],
+[aria-label*="is live" i],
+[aria-label*="Iglesia en vivo" i] {
+  display: none !important;
+}
+
+article:has(svg[aria-label*="En directo" i]),
+article:has(svg[aria-label*="Live" i]) {
+  display: none !important;
+}
+
+/* ---------- Shopping surfaces ---------- */
+a[href^="/shop/"],
+a[href*="/checkout"] {
+  display: none !important;
+}
+
+[aria-label*="Tienda" i],
+[aria-label*="Shop" i],
+[aria-label*="Ver producto" i],
+[aria-label*="View product" i],
+[aria-label*="Productos" i],
+[aria-label*="Products" i] {
+  display: none !important;
+}
+
+/* Product sticker overlay inside posts */
+article:has(span[aria-label*="Ver producto" i]),
+article:has(span[aria-label*="View product" i]) {
+  display: none !important;
+}
+
+/* ---------- Ads & "Suggested for you"/follow suggestions in feed ---------- */
+/* Instagram marks promoted posts with a visible heading span; conservative attr match */
+article:has([aria-label*="patrocinado" i]),
+article:has([aria-label*="Sponsored" i]),
+[aria-label*="Sugerencias para ti" i],
+[aria-label*="Suggested for you" i],
+[aria-label*="Suggested" i][role="button"] {
+  display: none !important;
+}
+
+/* Suggestion blocks (follow recommendations) */
+article:has([aria-label*="Sugerir" i][role="button"]),
+article:has(button[aria-label*="Seguir"][tabindex]),
+div:has(> div > div > [aria-label*="Sugerencias" i]) {
+  display: none !important;
+}
+
+/* Suggestions row — "Cuéntale a tus amigos" style cards */
+section:has(> div > [aria-label*="Cuéntale" i]),
+[aria-label*="Cuéntale a tus amigos" i],
+[aria-label*="Tell your friends" i] {
+  display: none !important;
+}
+
+/* Non-followed posts: heading-based detection via aria-label heuristics only */
+article:has([aria-label*="Ver más como este" i]),
+article:has([aria-label*="See more like this" i]) {
+  display: none !important;
+}
+
+/* ---------- Saved-posts prompts ---------- */
+[aria-label*="_guardado" i],
+[aria-label*="Saved" i][role="dialog"],
+[aria-label*="Guardado" i][role="dialog"] {
+  display: none !important;
+}
+
+/* ---------- Kept (do-not-touch): Following feed, Stories, DMs, profile — explicit, no selectors needed here, just no blanket hides above ---------- */

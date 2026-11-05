@@ -1,0 +1,133 @@
+/* Last verified: 2026-11-04 — selectors may drift when YouTube changes HTML */
+
+/* ===== Shorts ===== */
+
+/* Sidebar "Shorts" item and guide entry */
+ytd-guide-entry-renderer a[href*="/shorts"],
+ytd-mini-guide-entry-renderer a[href*="/shorts"],
+#endpoint[ytab*="shorts"],
+ytd-guide-entry-renderer:has(a[href="/shorts"]) {
+  display: none !important;
+}
+
+/* Shorts pill button in the top-level nav / pivot bar */
+yt-chips-cloud-renderer + ytd-feed-filter-chip-bar-renderer yt-chip-cloud-chip-renderer:has(a[href*="/shorts"]),
+yt-chip-cloud-chip-renderer:has(yt-formatted-string[title="Shorts"]),
+#filters yt-chip-cloud-chip-renderer:has(> a[href*="/shorts"]) {
+  display: none !important;
+}
+
+/* Short video items in home grid and search results */
+ytd-rich-item-renderer:has(ytd-reel-video-renderer),
+ytd-video-renderer:has(ytd-thumbnail[href*="/shorts/"]),
+ytd-video-renderer:has(a[href*="/shorts/"]),
+ytd-grid-video-renderer:has(a[href*="/shorts/"]),
+ytd-rich-grid-renderer ytd-rich-section-renderer:has(ytd-rich-shelf-renderer a[href*="/shorts/"]) {
+  display: none !important;
+}
+
+/* Shorts shelf inside watch page suggestions */
+ytd-watch-next-secondary-results-renderer ytd-item-section-renderer:has(a[href*="/shorts/"]),
+ytd-secondary-results-renderer ytd-reel-shelf-renderer,
+ytd-reel-shelf-renderer,
+#secondary ytd-shelf-renderer:has(ytd-reel-video-renderer) {
+  display: none !important;
+}
+
+/* Shorts overlay player (full-screen shorts browsing) */
+ytd-app[is-browse-home-page-active] ytd-reel-video-stream-renderer,
+ytd-shorts-player-overlay-renderer {
+  display: none !important;
+}
+
+/* ===== Home feed: empty to essentially subscriptions only =====
+   Conservative: only hide shelves/heuristics that say "not from a subscription channel".
+   Never blanket-hide ytd-rich-grid-renderer or the whole home grid. */
+
+/* "Subscriptions" / "Recommended for you" / "Trending" shelf headers on home */
+ytd-rich-section-renderer:has(ytd-rich-shelf-renderer yt-formatted-string[aria-label*="Recommended" i]),
+ytd-rich-section-renderer:has(ytd-rich-shelf-renderer yt-formatted-string[title*="Recommended" i]),
+ytd-rich-section-renderer:has(ytd-rich-shelf-renderer yt-formatted-string[aria-label*="Trending" i]),
+ytd-rich-section-renderer:has(ytd-rich-shelf-renderer yt-formatted-string[aria-label*="Continue watching" i]),
+ytd-rich-section-renderer:has(ytd-rich-shelf-renderer yt-formatted-string[aria-label*="Shopping" i]),
+ytd-rich-section-renderer:has(ytd-rich-shelf-renderer ytd-ad-slot-renderer) {
+  display: none !important;
+}
+
+/* Generic "Recommended"-style promoted cards in home grid rows (only when marked recommended) */
+ytd-rich-item-renderer:has(#dismissible ytd-video-meta-block span[aria-label*="Recommended" i]) {
+  display: none !important;
+}
+
+/* Livestream "LIVE" suggested shelf rows */
+ytd-rich-section-renderer:has(ytd-live-chat-banner-renderer),
+ytd-watch-next-secondary-results-renderer ytd-item-section-renderer:has(ytd-video-renderer badge-shape div[aria-label="LIVE"]),
+#secondary ytd-shelf-renderer:has(ytd-video-renderer[is-live]) {
+  display: none !important;
+}
+
+/* Shopping tab (chips) + hidden commerce shelf */
+yt-chip-cloud-chip-renderer:has(a[href*="/storefront"]),
+ytd-rich-section-renderer:has(ytd-merch-shelf-renderer),
+ytd-merch-shelf-renderer,
+ytd-rich-shelf-renderer:has(ytd-badge-supported-renderer ytd-badge-shape[aria-label*="Shopping" i]) {
+  display: none !important;
+}
+
+/* ===== Ads ===== */
+
+/* Thumbnail ads promoted by YouTube */
+ytd-promoted-video-renderer,
+.ytd-carousel-ad-renderer,
+ytd-promoted-sparkles-web-renderer,
+ytd-composite-ad-renderer,
+#player-ads,
+ytd-ad-slot-renderer {
+  display: none !important;
+}
+
+/* Masthead ad */
+ytd-masthead-ad,
+#masthead-ad,
+ytd-banner-promo-renderer {
+  display: none !important;
+}
+
+/* ===== Watch page: "Up next" autoplay panel, end screens, info cards ===== */
+
+/* Up next / autoplay suggestion panel next to player */
+.ytd-horizontal-card-list-renderer,
+ytd-horizontal-card-list-renderer,
+ytd-watch-next-secondary-results-renderer > ytd-compact-autoplay-renderer,
+#upnext,
+.upnext-buffer,
+.ytp-autonav-container {
+  display: none !important;
+}
+
+/* End screen suggested-card overlays on the player */
+.ytp-endscreen-content,
+.ytp-endscreen-element,
+.ytp-ce-element,
+.ytp-autonav-endscreen-upnext-container,
+.ytp-endscreen-upnext {
+  display: none !important;
+}
+
+/* Info cards overlays on the player */
+.ytp-cards-teaser,
+.ytp-paid-content-overlay,
+.ytp-info-cards-button,
+.ytp-cards-button,
+.ytp-cards-teaser-show-container,
+.ytp-autohide .ytp-player-content.ytp-cards-teaser {
+  display: none !important;
+}
+
+/* ===== Comments (DEFAULT: OFF) =====
+   Default F-defaults: keep comments visible. Uncomment to hide. */
+/* ytd-comments#comments,
+#comments ytd-comment-thread-renderer,
+ytd-watch-metadata #comments-separator {
+  display: none !important;
+} */

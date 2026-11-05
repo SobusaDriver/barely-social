@@ -1,0 +1,145 @@
+/* Last verified: 2026-11-04 — selectors may drift when TikTok changes HTML */
+/*
+ * SocialLite rule: www.tiktok.com (pure CSS, hide-only / fail-open)
+ * Preserved: Following feed, /messages, search, profile visits, login.
+ * Hide-only: nothing on kept surfaces is resized, moved, or reflowed.
+ */
+
+/* ================= For You feed ================= */
+
+/* FYP as a nav tab (top-level desktop tab + mobile top-tabs "For You") */
+div[data-e2e="channel-foryou"],
+div[data-e2e="nav-foryou"],
+tiktok-top-tabs div:not([id="tab-following"]),
+/* Named FYP surfaces */
+div[data-e2e="for-you-page"],
+div[data-e2e="recommend-list"],
+div[id^="app-tiktok-web-feed-"],
+main div[class*="DivFeedContainer"],
+div[class*="DivForYou"],
+/* FYP overlay / full-bleed video feed */
+div[data-e2e="browse-recommend"],
+div[data-e2e="fyp"],
+section[data-e2e="feed-item"],
+div[class*="DivItemContainer"] > div[class*="DivPlayerContainer"] {
+  display: none !important;
+}
+
+/* ================= Explore / Discover ================= */
+
+div[data-e2e="nav-explore"],
+div[data-e2e="nav-discover"],
+div[data-e2e="explore-page"],
+div[data-e2e="explore-item"],
+div[class*="DivExplore"],
+a[href^="/explore"],
+a[href^="/discover"],
+div[class*="DivChannelExploreContainer"] {
+  display: none !important;
+}
+
+/* ================= Suggested accounts / videos ================= */
+
+/* "People you may like", suggested accounts shelf */
+div[data-e2e="suggest-activity-icon"],
+div[data-e2e="recommend-user"],
+div[data-e2e="suggested-account"],
+div[class*="DivSuggestActivity"],
+div[class*="DivRecommendedUser"],
+div[class*="DivPeopleSuggest"],
+div[class*="DivSuggestionContainer"],
+div[class*="DivFollowSuggest"],
+/* Related / suggested content accompanying videos */
+div[data-e2e="related-video"],
+div[data-e2e="related-item"],
+div[data-e2e="related-video-list"],
+div[class*="DivRelatedVideo"],
+div[class*="DivRelateCard"],
+/* Reposted suggested videos */
+div[data-e2e="recommend-copy-link"],
+div[class*="DivRepostContainer"],
+div[class*="DivRepostData"] {
+  display: none !important;
+}
+
+/* ================= LIVE / livestream ================= */
+
+div[data-e2e="nav-live"],
+div[data-e2e="live-nav"],
+div[data-e2e="live_container"],
+div[data-e2e="livelisting"],
+div[data-e2e="live-shelf"],
+div[class*="DivLiveContainer"],
+div[class*="DivLiveFeedContainer"],
+div[class*="DivLiveShelf"],
+a[href^="/live"],
+a[href^="/tag/LIVE"],
+tiktok-live-host-badge,
+tiktok-feed-host-badge {
+  display: none !important;
+}
+
+/* ================= Shop / commerce ================= */
+
+div[data-e2e="nav-shop"],
+div[data-e2e="shop-tab"],
+div[data-e2e="commerce-shelf"],
+div[data-e2e="product-card"],
+div[class*="DivShopContainer"],
+div[class*="DivCommerceCard"],
+div[class*="DivProductCardContainer"],
+a[href*="/shop"],
+a[href$="/foryoushop"],
+tiktok-commerce-component {
+  display: none !important;
+}
+
+/* ================= Ads / promoted / sponsored ================= */
+
+div[data-e2e="ad-item"],
+div[data-e2e="ad-card"],
+div[data-e2e="promoted-item"],
+div[data-e2e="adv-container"],
+div[data-e2e="promotion-banner"],
+div[class*="DivAdWrap"],
+div[class*="DivItemAdContainer"],
+div[class*="DivPromoteContainer"],
+div[class*="DivPromotedBanner"],
+div[class*="DivAdCardContainer"],
+div[class*="DivAdFeedContainer"],
+div[class*="DivSponsorCardContainer"],
+span[data-e2e="ad-label"],
+div[data-e2e="ad_label"],
+img[alt="Sponsored"],
+img[alt="Promoted"] {
+  display: none !important;
+}
+
+/* Hide generic ad-creative containers rendered inside the feed flow */
+div[ad-sdk-enabled],
+div[log-info] {
+  display: none !important;
+}
+
+/* ============================================================
+ * Block posting (post/record/upload button) — TOGGLE RULE
+ * ------------------------------------------------------------
+ * This block corresponds to the "Block posting" preference.
+ *   Default OFF (below): the post button stays visible — the
+ *   user keeps the ability to post. Leave the next rules
+ *   COMMENTED OUT to match the default.
+ *
+ * To enable (default OFF -> ON), uncomment:
+ *
+div[data-e2e="browse-pc-post"],
+div[data-e2e="upload-post"],
+div[data-e2e="web-upload-entry"],
+div[class*="DivCreateEntry"],
+div[class*="DivPostButton"],
+a[href^="/upload"],
+a[href^="/creator-center"],
+button[data-e2e="create-button"] {
+  display: none !important;
+}
+ *
+ * ============================================================ */

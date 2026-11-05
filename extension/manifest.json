@@ -1,0 +1,64 @@
+{
+  "manifest_version": 3,
+  "name": "BarelySocial",
+  "version": "0.1.0",
+  "description": "Redes sociales sin scroll: solo lo que sigues, mensajes y búsqueda. Bloquea Reels/Shorts/For You/Explore/ads.",
+  "permissions": ["storage", "declarativeNetRequest", "declarativeNetRequestWithHostAccess"],
+  "host_permissions": [
+    "https://*.instagram.com/*",
+    "https://*.youtube.com/*",
+    "https://*.reddit.com/*",
+    "https://*.linkedin.com/*",
+    "https://*.tiktok.com/*"
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      { "id": "ads_tracking", "enabled": true, "path": "rules/dnr.json" }
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.instagram.com/*"],
+      "js": ["content.js"],
+      "css": ["rules/instagram.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://*.youtube.com/*"],
+      "js": ["content.js"],
+      "css": ["rules/youtube.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://*.reddit.com/*"],
+      "js": ["content.js"],
+      "css": ["rules/reddit.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://*.linkedin.com/*"],
+      "js": ["content.js"],
+      "css": ["rules/linkedin.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://*.tiktok.com/*"],
+      "js": ["content.js"],
+      "css": ["rules/tiktok.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "BarelySocial"
+  }
+}

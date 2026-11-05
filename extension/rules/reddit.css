@@ -1,0 +1,132 @@
+/* Last verified: 2026-11-04 — selectors may drift when Reddit changes HTML */
+/* BarelySocial — reddit.com new UI (shreddit). Pure hide-only CSS, fail-open. */
+
+/* ================= Nav: Popular / News / Explore tabs ================= */
+/* Links in left sidebar and any nav/pill bar, by href */
+nav a[href="/popular"],
+nav a[href="/news"],
+nav a[href="/explore"],
+a[href="/popular"][slot],
+#left-sidebar a[href="/popular"],
+#left-sidebar a[href="/news"],
+#left-sidebar a[href="/explore"],
+#left-nav a[href="/popular"],
+#left-nav a[href="/news"],
+#left-nav a[href="/explore"] {
+  display: none !important;
+}
+/* Tab elements (pill bar / bottom bar use faceplate tabs) */
+faceplate-tab-item[href="/popular"],
+faceplate-tab-item[href="/news"],
+faceplate-tab-item[href="/explore"],
+faceplate-tab-group faceplate-tab-item[href*="/popular"],
+faceplate-tab-group faceplate-tab-item[href*="/news"],
+faceplate-tab-group faceplate-tab-item[href*="/explore"] {
+  display: none !important;
+}
+
+/* ================= Popular / News / Explore page listings ================= */
+/* Blank the feeds; the page shell stays so nav still works. */
+main[src="/popular"] shreddit-feed,
+main[src="/news"] shreddit-feed,
+main[src="/explore"] shreddit-feed,
+main[src="/popular"] main,
+main[src="/news"] main,
+shreddit-feed[src*="/popular"],
+shreddit-feed[src*="/news"],
+shreddit-feed[src*="/explore"],
+div[routable]:not([hidden]) > main[src="/popular"] > :not(h1),
+/* Explore page sections/cards */
+#explore-feed,
+[data-testid="explore-feed"],
+/* News page article cards */
+div[data-testid="news-feed"] {
+  display: none !important;
+}
+/* Explore cards rendered as generic modules on /explore */
+main[src="/explore"] article,
+main[src="/explore"] faceplate-batch[data-testid="explore-*"] {
+  display: none !important;
+}
+
+/* ================= Ads & promoted posts ================= */
+shreddit-ad-post,
+shreddit-ad-top,
+shreddit-promo,
+shreddit-compact-post[promoted],
+div[aria-label="promoted post"],
+[data-testid="post-container"][promoted],
+a[data-testid="post-title"] ~ div[promoted],
+faceplate-tracker[nsource="reddit_promo"],
+faceplate-tracker[src="reddit_promo"],
+faceplate-batch[class*="promoted"],
+div[class*="promoted-link"],
+div[data-promoted],
+/* Inline "promoted"/ad labels + surrounding wrappers that are ad-only */
+div[data-testid="post-container"]:has(> div:only-child > [promoted]),
+div[data-testid="post-container"]:has(> [promoted]) > [promoted] {
+  display: none !important;
+}
+
+/* Hide generic ad banners / native ad modules outside feeds */
+div:has(> shreddit-ad-post),
+shreddit-title + div:has(> [promoted]) {
+  display: none !important;
+}
+
+/* ================= Recommended / suggested posts (home feed) ================= */
+/* Hide shreddit-post elements explicitly marked as recommended */
+shreddit-post[recommended],
+shreddit-post[data-recommended],
+shreddit-post[post-recommendation],
+/* Suggested/similar posts blocks and their trackers */
+faceplate-tracker[src*="recommend"],
+faceplate-tracker[nsource*="recommend"],
+div[data-testid="recommendation-tracker"],
+shreddit-similar-posts,
+/* "Continue exploring" / recommendation feed variants */
+div[data-testid="frontpage-featured"],
+[data-source="frontpage-featured"],
+shreddit-feed[data-source="frontpage-featured"],
+/*tue-blend feed of non-joined suggestions */
+shreddit-feed[tue-blend],
+div[data-testid="subreddit-recommended"],
+/* "recommended from r/..." banner cards inside feed */
+shreddit-post:has(> faceplate-tracker[src*="recommend"]),
+div[data-testid="post-container"]:has(> faceplate-tracker[src*="recommend"]),
+div:has(> div > a[href*="/recommended/"]),
+a[href*="/recommendations/"] {
+  display: none !important;
+}
+/* Hide the visible "Recommended from r/X" pill/label rows (whole card removed above; label fallback) */
+span:has(> a[href*="/recommended/"]) {
+  display: none !important;
+}
+
+/* ================= Explore feed sections on home ================= */
+div[data-testid="explore-section"],
+section[data-testid="explore"],
+/* "Discover" module on home */
+div[data-testid="discover-module"],
+/*tue-blend alternative markup */
+shreddit-feed[data-frontpage-featured-source="recommendation"] {
+  display: none !important;
+}
+
+/* ================= Latest feed (if present) ================= */
+main[src="/latest"] shreddit-feed,
+shreddit-feed[src*="/latest"],
+faceplate-tab-item[href="/latest"],
+a[href="/latest"][slot] {
+  display: none !important;
+}
+
+/* ================= Ads inside kept pages (subreddit/post detail) ================= */
+shreddit-post[promoted],
+shreddit-ad-post:defined,
+aside[class*="ad"],
+div[aria-label="advertisement"],
+div[data-testid="ad-unit"],
+div[data-adserver-temporary-id] {
+  display: none !important;
+}
